@@ -22,22 +22,30 @@ def sobel(image):
 
     rh = convolution(image, v, 'extend')
     rv = convolution(image, h, 'extend')
+    # Debug: save horizontal and vertical sobel convolutions
+    #np.savetxt('rh.txt',rh)
+    #np.savetxt('rv.txt',rv)
 
     edge_gradient = np.zeros(image.shape)
+    gradient_direction = np.zeros(image.shape)
     for y in range(image.shape[0]):
         for x in range(image.shape[1]):
             edge_gradient[y][x] = math.sqrt(rh[y][x]**2 + rv[y][x]**2)
-    return 255.*np.absolute(edge_gradient)/np.max(edge_gradient)
+            gradient_direction[y][x] = math.atan2(rv[y][x],rh[y][x])
+    return 255.*np.absolute(edge_gradient)/np.max(edge_gradient), gradient_direction
 
 def main():
     I = np.asarray(Image.open('test.png').convert('L'),dtype=np.float32)
     np.savetxt('image.txt',np.around(I,3),fmt='%.2f',delimiter='|')
     g = gaussiankernel(2,5)
-    a = convolution(I,g,'extend')
-    print(a)
-    Image.fromarray(a.astype(np.uint8)).show()
-    np.savetxt('convolved.txt',np.around(a,3),fmt='%.2f',delimiter='|',newline='EOL')
-    #Image.fromarray(sobel(a).astype(np.uint8)).show()
+    gaussian_result = convolution(I,g,'extend')
+    Image.fromarray(gaussian_result.astype(np.uint8)).show()
+    #np.savetxt('gaussian.txt',np.around(a,3),fmt='%.2f',delimiter='|',newline='EOL')   
+    #np.savetxt('sobel.txt',np.around(b,3),delimiter='|')    
+    sobel_result_gradient,sobel_result_direction = sobel(gaussian_result)
+    #Perhaps plot gradient direction?
+    Image.fromarray(sobel_result_gradient.astype(np.uint8)).show()
+    
 
 if __name__ == '__main__':
     main()
