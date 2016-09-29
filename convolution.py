@@ -5,36 +5,12 @@ channels=1
 def convolution(I,g,mode):
     if g.shape[0] != g.shape[1]:
         print('Kernel must be symmetric.')
-    if mode == 'crop': #make it REMOVE empty pixels
-        r = np.zeros(I.shape)
-        for y in range(1-g.shape[0],I.shape[0]+1-g.shape[0]):
-            for x in range(1-g.shape[1],I.shape[1]+1-g.shape[1]):
-                if y < 0 or y > I.shape[0]-1 or x < 0 or x > I.shape[1]-1:
-                    continue
-                p = 0
-                for i in range(g.shape[0]):
-                    for j in range(g.shape[1]):
-                        p+=I[y+i][x+j] * g[i][j]
-                r[y+g.shape[0]-1][x+g.shape[1]-1] = p
-    if mode == 'zero': #works
-        r = np.zeros(I.shape)
-        pad = int(math.floor(g.shape[0]/2))
-        for y in range(I.shape[0]):
-            for x in range(I.shape[1]):                
-                p = 0
-                for i in range(-pad,pad+1):
-                    for j in range(-pad,pad+1):
-                        if y+i < 0 or y+i > I.shape[0]-1 or x+j < 0 or x+j > I.shape[1]-1:
-                            p+=0
-                        else:
-                            p+=I[y+i][x+j] * g[i+pad][j+pad]
-                r[y][x] = p
     if mode == 'extend':
         r = np.zeros(I.shape)
         pad = int(math.floor(g.shape[0]/2))
         for y in range(I.shape[0]):
             for x in range(I.shape[1]):
-                if (y-pad<0 and x-pad<0): #Top left corner            ###########  
+                if (y-pad<0 and x-pad<0): #Top left corner              
                     p=0                    
                     bufx = pad-x
                     bufy = pad-y
@@ -54,7 +30,7 @@ def convolution(I,g,mode):
                     for i in range(0,g.shape[0]): #Convolute
                         for j in range(0,g.shape[0]):
                             p+=a[i][j] * g[i][j]
-                    r[y][x]=p                    
+                    r[y][x]=p
                 elif (y-pad<0 and x+pad>=I.shape[1]): #Top right corner
                     p=0
                     bufx = pad-(I.shape[1]-1-x) 
@@ -72,6 +48,28 @@ def convolution(I,g,mode):
                     for i in range(bufy,g.shape[0]):
                         for j in range(bufx,g.shape[0]):
                             a[i][j] = a[i][bufx]
+                    for i in range(0,g.shape[0]): #Convolute
+                        for j in range(0,g.shape[0]):
+                            p+=a[i][j] * g[i][j]
+                    r[y][x]=p 
+                elif (y+pad>=I.shape[0] and x+pad>=I.shape[1]): #Bottom right corner
+                    p=0
+                    bufx=pad-(I.shape[1]-1-x)
+                    bufy=pad-(I.shape[0]-1-y)
+                    a=np.zeros(g.shape)
+                    for i in range(-pad,pad+1-bufy): #Fill array
+                        for j in range(-pad,pad+1-bufx):
+                            a[i+pad][j+pad] = I[y+i][x+j]
+                    #Replace pixels beyond edge
+                    for i in range(0,g.shape[0]-bufy): 
+                        for j in range(g.shape[1]-bufx,g.shape[1]):          
+                            a[i][j] = a[i][g.shape[1]-bufx-1]
+                    for i in range(g.shape[0]-bufy,g.shape[0]):
+                        for j in range(g.shape[1]-bufx,g.shape[1]):
+                            a[i][j] = a[g.shape[0]-bufy-1][g.shape[1]-bufx-1]
+                    for i in range(g.shape[0]-bufy,g.shape[0]):
+                        for j in range(0,g.shape[1]-bufx):
+                            a[i][j] = a[g.shape[0]-bufy-1][j]
                     for i in range(0,g.shape[0]): #Convolute
                         for j in range(0,g.shape[0]):
                             p+=a[i][j] * g[i][j]
@@ -97,29 +95,6 @@ def convolution(I,g,mode):
                         for j in range(0,g.shape[0]):
                             p+=a[i][j] * g[i][j]
                     r[y][x]=p 
-                elif (y+pad>=I.shape[0] and x+pad>=I.shape[1]): #Bottom right corner
-                    r = np.zeros(I.shape)
-                    p=0
-                    bufx=pad-(I.shape[1]-1-x)
-                    bufy=pad-(I.shape[0]-1-y)
-                    a=np.zeros(g.shape)
-                    for i in range(-pad,pad+1-bufy): #Fill array
-                        for j in range(-pad,pad+1-bufx):
-                            a[i+pad][j+pad] = I[y+i][x+j]
-                    #Replace pixels beyond edge
-                    for i in range(0,g.shape[0]-bufy): 
-                        for j in range(g.shape[1]-bufx,g.shape[1]):          
-                            a[i][j] = a[i][g.shape[1]-bufx-1]
-                    for i in range(g.shape[0]-bufy,g.shape[0]):
-                        for j in range(g.shape[1]-bufx,g.shape[1]):
-                            a[i][j] = a[g.shape[0]-bufy-1][g.shape[1]-bufx-1]
-                    for i in range(g.shape[0]-bufy,g.shape[0]):
-                        for j in range(0,g.shape[1]-bufx):
-                            a[i][j] = a[g.shape[0]-bufy-1][j]
-                    for i in range(0,g.shape[0]): #Convolute
-                        for j in range(0,g.shape[0]):
-                            p+=a[i][j] * g[i][j]
-                    r[y][x]=p
                 elif y-pad<0 or y+pad>I.shape[0]-1: #Horizontal
                     p=0                    
                     if y-pad<0: #Top horizontal
@@ -174,8 +149,10 @@ def convolution(I,g,mode):
                         for j in range(-pad,pad+1):
                             p+=I[y+i][x+j] * g[i+pad][j+pad]
                     r[y][x] = p
-                
     if mode == 'wrap':
         pass
-    #not sure, use negative indices
+    if mode == 'zero':
+        pass
+    if mode == 'crop':
+        pass
     return r
