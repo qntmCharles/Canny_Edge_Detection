@@ -1,0 +1,16 @@
+Plan:
+1: Gaussian Blur [DONE]
+2: Sobel [DONE]
+3: Non-Maximum Suppression
+	3.1 Iterate through horiz, vert
+		3.1.1 Iterate over image
+			3.1.1.1 Check if local maximum and assign value
+4: Hysteresis Thresholding
+5: GUI
+
+
+
+
+TODO:
+-Make sure it's converted to grayscale at the beginning
+-Investigate dynamic thresholds
