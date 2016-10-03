@@ -14,8 +14,8 @@ def sobel(image):
                                  [ 2, 0,-2],
                                  [ 1, 0,-1]])
 
-    horizontal_convolution = convolution(image, v, 'extend')
-    vertical_convolution = convolution(image, h, 'extend')
+    horizontal_convolution = convolution(image, vertical_kernel, 'extend')
+    vertical_convolution = convolution(image, horizontal_kernel, 'extend')
 
     edge_gradient = np.zeros(image.shape)
     gradient_direction = np.zeros(image.shape)
@@ -24,7 +24,6 @@ def sobel(image):
         for x in range(image.shape[1]):
             edge_gradient[y][x] = math.sqrt(horizontal_convolution[y][x]**2 +
                     vertical_convolution[y][x]**2)
-
             gradient_direction[y][x] = math.atan2(vertical_convolution[y][x],
                     horizontal_convolution[y][x])
 

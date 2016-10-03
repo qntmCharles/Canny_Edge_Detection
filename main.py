@@ -7,21 +7,23 @@ from __future__ import division
 from PIL import Image
 import numpy as np
 import math
+import matplotlib.pyplot as plt
 
 from convolution import convolution
 from gaussian import G,gaussiankernel
 from sobel import sobel
+from plot import plot
 
 def main():
     I = np.asarray(Image.open('test.png').convert('L'),dtype=np.float32)
-    np.savetxt('image.txt',np.around(I,3),fmt='%.2f',delimiter='|')
+    #np.savetxt('image.txt',np.around(I,3),fmt='%.2f',delimiter='|')
     g = gaussiankernel(2,5)
     gaussian_result = convolution(I,g,'extend')
     Image.fromarray(gaussian_result.astype(np.uint8)).show()
     #np.savetxt('gaussian.txt',np.around(a,3),fmt='%.2f',delimiter='|',newline='EOL')
     #np.savetxt('sobel.txt',np.around(b,3),delimiter='|')
     sobel_result_gradient,sobel_result_direction = sobel(gaussian_result)
-    #Perhaps plot gradient direction?
+    plot(sobel_result_direction)
     Image.fromarray(sobel_result_gradient.astype(np.uint8)).show()
 
 
