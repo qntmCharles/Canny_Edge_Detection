@@ -14,3 +14,5 @@ Plan:
 TODO:
 -Make sure it's converted to grayscale at the beginning
 -Investigate dynamic thresholds
+-Try using multiproccessing (maybe)
+-Edge handling for non maximum suppression algorithm
