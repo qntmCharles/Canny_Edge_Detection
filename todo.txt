@@ -15,4 +15,8 @@ TODO:
 -Make sure it's converted to grayscale at the beginning
 -Investigate dynamic thresholds
 -Try using multiproccessing (maybe)
+-WHY ISN'T IT FINDING THE RIGHT EDGES!?
+-Improve non-maximum suppression algorithm - linear interpolation (the program
+		won't work until this is done. Need to change 'h' and 'v' to correct
+		angles.)
 -Edge handling for non maximum suppression algorithm
