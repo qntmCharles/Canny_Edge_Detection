@@ -24,10 +24,12 @@ def main():
     #np.savetxt('gaussian.txt',np.around(a,3),fmt='%.2f',delimiter='|',newline='EOL')
     #np.savetxt('sobel.txt',np.around(b,3),delimiter='|')
     sobel_result_gradient,sobel_result_direction,sobel_result_direction2 = sobel(gaussian_result)
-    #plot(sobel_result_direction2)
+    #plt.imshow(sobel_result_gradient,cmap='gist_rainbow',interpolation='nearest')
+    #plt.show()
+    plot(sobel_result_direction2)
     #Image.fromarray(sobel_result_gradient.astype(np.uint8)).show()
     suppressed_image = non_maximum_suppresion(sobel_result_gradient,sobel_result_direction)
-    Image.fromarray(suppressed_image).show()
+    #Image.fromarray(suppressed_image).show()
 
 if __name__ == '__main__':
     main()

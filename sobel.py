@@ -27,7 +27,7 @@ def sobel(image):
             if horizontal_convolution[y][x] != 0:
                 temp_direction = math.atan(vertical_convolution[y][x]/horizontal_convolution[y][x])
             else:
-                temp_direction = 90
+                temp_direction = math.pi/2
             gradient_direction_plot[y][x] = temp_direction
             if temp_direction >= math.atan(3*math.pi/8) or (temp_direction < math.atan(-3*math.pi/8)):
                 gradient_direction[y][x] = 90
