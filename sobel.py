@@ -1,11 +1,12 @@
 from __future__ import division
 import numpy as np
 import math
+from matplotlib import pyplot as plt
 
 from convolution import convolution
 
 def sobel(image):
-
+    #Sobel horiz/vert kernels
     horizontal_kernel = np.array([[ 1, 2, 1],
                                   [ 0, 0, 0],
                                   [-1,-2,-1]])
@@ -13,33 +14,32 @@ def sobel(image):
     vertical_kernel  = np.array([[ 1, 0,-1],
                                  [ 2, 0,-2],
                                  [ 1, 0,-1]])
+    #Perform convolution using kernels
+    horizontal = convolution(image, vertical_kernel, 'extend')
+    vertical = convolution(image, horizontal_kernel, 'extend')
 
-    horizontal_convolution = convolution(image, vertical_kernel, 'extend')
-    vertical_convolution = convolution(image, horizontal_kernel, 'extend')
-
-    edge_gradient = np.zeros(image.shape)
-    gradient_direction = np.zeros(image.shape).astype(np.str)
-    gradient_direction_plot = np.zeros(image.shape)
-
+    #Create arrays of zeros
+    gradient = np.zeros(image.shape)
+    direction = np.zeros(image.shape).astype(np.str)
+    count=[0,0,0,0]
+    #Iterate over image
     for y in range(image.shape[0]):
         for x in range(image.shape[1]):
-            edge_gradient[y][x] = math.sqrt(horizontal_convolution[y][x]**2 + vertical_convolution[y][x]**2)
-            if horizontal_convolution[y][x] != 0:
-                temp_direction = math.atan(vertical_convolution[y][x]/horizontal_convolution[y][x])
+            #Calculate gradient magnitude
+            gradient[y][x] =math.sqrt(horizontal[y][x]**2 + vertical[y][x]**2)
+
+            #If horizontal component isn't 0, calculate gradient direction
+            if horizontal[y][x] != 0:
+                direction[y][x] = math.atan(vertical[y][x]/horizontal[y][x])
+            #If horizontal component is 0, then direction is either +pi or -pi
             else:
-                temp_direction = math.pi/2
-            gradient_direction_plot[y][x] = temp_direction
-            if temp_direction >= math.atan(3*math.pi/8) or (temp_direction < math.atan(-3*math.pi/8)):
-                gradient_direction[y][x] = 90
-            if (temp_direction < math.atan(3*math.pi/8)) and (temp_direction >= math.atan(math.pi/8)):
-                gradient_direction[y][x] = 45
-            if (temp_direction < math.atan(math.pi/8)) and (temp_direction >= math.atan(-math.pi/8)):
-                gradient_direction[y][x] = 0
-            if (temp_direction < math.atan(-math.pi/8)) and (temp_direction >= math.atan(-3*math.pi/8)):
-                    gradient_direction[y][x] = 135
+                if vertical[y][x] >= 0:
+                    direction[y][x] = math.pi/2
+                else:
+                    direction[y][x] = -math.pi/2
 
+    #normalize gradient so that the image isn't darkened
+    normalized_gradient = 255.*np.absolute(gradient)/np.max(gradient)
 
-    normalized_edge_gradient = 255.*np.absolute(edge_gradient)/np.max(edge_gradient)
-
-    return normalized_edge_gradient, gradient_direction, gradient_direction_plot
+    return normalized_gradient, direction
 

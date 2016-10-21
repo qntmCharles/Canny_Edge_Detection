@@ -1,19 +1,20 @@
 Plan:
 1: Gaussian Blur [DONE]
 2: Sobel [DONE]
-3: Non-Maximum Suppression
-	3.1 Iterate through horiz, vert
-		3.1.1 Iterate over image
-			3.1.1.1 Check if local maximum and assign value
+3: Non-Maximum Suppression [DONE]
 4: Hysteresis Thresholding
 5: GUI
 
-
-
-
 TODO:
--Make sure it's converted to grayscale at the beginning
+Urgent:
+-Comment that shit:
+	-gaussian [DONE]
+	-convolution [DONE]
+	-nms - ugh do I have to?
+	-main
+	-plot [DONE]
+	-sobel [DONE]
+Potential:
+-Change gaussian kernel radius to be 6*sigma
 -Investigate dynamic thresholds
--Try using multiproccessing (maybe)
--WHY ISN'T IT FINDING THE RIGHT EDGES!? - maybe fixed my linear interpolation?
--Improve non-maximum suppression algorithm - linear interpolation 
+-Try using multiprocessing (maaaaaybe)
