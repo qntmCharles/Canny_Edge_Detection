@@ -152,20 +152,19 @@ def non_maximum_suppression(magnitude,direction):
             #Need to deal with upper_gradient or lower_gradient being None
             if (upper_gradient == None) and (lower_gradient != None):
                 if magnitude[y][x] >= lower_gradient:
-                    output[y][x] = 255
+                    output[y][x] = magnitude[y][x]
                 else:
                     output[y][x] = 0
             elif (upper_gradient != None) and (lower_gradient == None):
                 if magnitude[y][x] >= upper_gradient:
-                    output[y][x] = 255
+                    output[y][x] = magnitude[y][x]
                 else:
                     output[y][x] = 0
             elif (upper_gradient == None) and (lower_gradient == None):
-                print('fuck')
-                output[y][x] = 255
+                output[y][x] = magnitude[y][x]
             elif (magnitude[y][x] >= upper_gradient) and (
                 magnitude[y][x] >= lower_gradient):
-                output[y][x] = 255
+                output[y][x] = magnitude[y][x]
             else:
                 output[y][x] = 0
     return output

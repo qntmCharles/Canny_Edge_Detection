@@ -12,22 +12,35 @@ import matplotlib.pyplot as plt
 from convolution import convolution
 from gaussian import G,gaussiankernel
 from sobel import sobel
-from plot import plot
-from nmsimproved import non_maximum_suppression
+from nms import non_maximum_suppression
+from hysteresis import hysteresis
+from threshold import calculateThresholds, threshold_image
 
 def main():
-    I = np.asarray(Image.open('test.png').convert('L'),dtype=np.float32)
+    I = np.asarray(Image.open('sample.png').convert('L'),dtype=np.float32)
     #np.savetxt('image.txt',np.around(I,3),fmt='%.2f',delimiter='|')
     g = gaussiankernel(0.5,5)
+    print('Performing Gaussian blur...')
     gaussian_result = convolution(I,g,'extend')
+    print('Gaussian blur complete!')
     #Image.fromarray(gaussian_result.astype(np.uint8)).show()
+    print('Performing Sobel convolution...')
     sobel_result_gradient,sobel_result_direction = sobel(gaussian_result)
     sobel_result_direction = sobel_result_direction.astype('float')
     sobel_result_gradient = sobel_result_gradient.astype('float')
+    print('Sobel convolution complete!')
+    print('Performing non maximum suppression...')
     suppressed_image = non_maximum_suppression(sobel_result_gradient,sobel_result_direction)
-    plt.imshow(suppressed_image,cmap='gray')
-    plt.show()
-    Image.fromarray(suppressed_image).show()
+    print('Non maximum suppression complete!')
+    print('Thresholding image...')
+    threshold = calculateThresholds(I)
+    thresholded_image = threshold_image(suppressed_image,0.05*threshold,0.3*threshold)
+    print('Thresholding complete!')
+    #Image.fromarray(thresholded_image).show()
+    print('Performing threshold hysteresis...')
+    final_image = hysteresis(thresholded_image)
+    print('Threshold hysteresis complete!')
+    Image.fromarray(final_image).show()
 
 
 if __name__ == '__main__':
