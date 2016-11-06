@@ -9,32 +9,31 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 
-from convolution import convolution
-from gaussian import G,gaussiankernel
+from gaussian import gaussian
 from sobel import sobel
-from nms import non_maximum_suppression
+from nms import nonMaximumSuppression
 from hysteresis import hysteresis
-from threshold import calculateThresholds, threshold_image
+from threshold import threshold,generateHistogram
 
 def main():
-    I = np.asarray(Image.open('sample.png').convert('L'),dtype=np.float32)
-    #np.savetxt('image.txt',np.around(I,3),fmt='%.2f',delimiter='|')
-    g = gaussiankernel(0.5,5)
+    I = np.asarray(Image.open('test.png').convert('L'),dtype=np.float32)
     print('Performing Gaussian blur...')
-    gaussian_result = convolution(I,g,'extend')
+    gaussian_result = gaussian(0.5,5,I)
     print('Gaussian blur complete!')
     #Image.fromarray(gaussian_result.astype(np.uint8)).show()
     print('Performing Sobel convolution...')
-    sobel_result_gradient,sobel_result_direction = sobel(gaussian_result)
-    sobel_result_direction = sobel_result_direction.astype('float')
-    sobel_result_gradient = sobel_result_gradient.astype('float')
+    sobelGradient,sobelDirection = sobel(gaussian_result)
+    sobelDirection = sobelDirection.astype('float')
+    sobelGradient = sobelGradient.astype('float')
     print('Sobel convolution complete!')
     print('Performing non maximum suppression...')
-    suppressed_image = non_maximum_suppression(sobel_result_gradient,sobel_result_direction)
+    suppressed_image = nonMaximumSuppression(sobelGradient,sobelDirection)
     print('Non maximum suppression complete!')
+    h = generateHistogram(suppressed_image)
+    plt.bar(h.keys(),h.values(),1)
+    plt.show()
     print('Thresholding image...')
-    threshold = calculateThresholds(I)
-    thresholded_image = threshold_image(suppressed_image,0.05*threshold,0.3*threshold)
+    thresholded_image = threshold(I,suppressed_image)
     print('Thresholding complete!')
     #Image.fromarray(thresholded_image).show()
     print('Performing threshold hysteresis...')

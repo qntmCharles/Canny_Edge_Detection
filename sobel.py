@@ -15,13 +15,12 @@ def sobel(image):
                                  [ 2, 0,-2],
                                  [ 1, 0,-1]])
     #Perform convolution using kernels
-    horizontal = convolution(image, vertical_kernel, 'extend')
-    vertical = convolution(image, horizontal_kernel, 'extend')
+    horizontal = convolution(image, vertical_kernel)
+    vertical = convolution(image, horizontal_kernel)
 
     #Create arrays of zeros
     gradient = np.zeros(image.shape)
     direction = np.zeros(image.shape).astype(np.str)
-    count=[0,0,0,0]
     #Iterate over image
     for y in range(image.shape[0]):
         for x in range(image.shape[1]):
@@ -38,8 +37,8 @@ def sobel(image):
                 else:
                     direction[y][x] = -math.pi/2
 
-    #normalize gradient so that the image isn't darkened
-    normalized_gradient = 255.*np.absolute(gradient)/np.max(gradient)
+    #normalise gradient so that the image isn't darkened
+    normalised_gradient = 255.*np.absolute(gradient)/np.max(gradient)
 
-    return normalized_gradient, direction
+    return normalised_gradient, direction
 

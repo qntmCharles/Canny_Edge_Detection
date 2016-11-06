@@ -3,16 +3,12 @@ import math
 import numpy as np
 
 def checkExists(coordinates,shape):
-    flag = 0
     for i in range(len(coordinates)):
             if coordinates[i] > shape[i]-1:
-                flag = 1
-    if flag == 1:
-        return False
-    else:
-        return True
+                return False
+    return True
 
-def non_maximum_suppression(magnitude,direction):
+def nonMaximumSuppression(magnitude,direction):
     #Create empty array of zeros to contain result
     output = np.zeros(magnitude.shape)
 

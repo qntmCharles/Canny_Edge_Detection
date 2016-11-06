@@ -2,16 +2,7 @@ Plan:
 1: Gaussian Blur [DONE]
 2: Sobel [DONE]
 3: Non-Maximum Suppression [DONE]
-4: Hysteresis Thresholding
-	4.1 Calculate low and high thresholds using Otsu's method [DONE]
-	4.2 Iterate over image and identify strong edges, potential edges and discard noise. [DONE]
-	4.3 Hysteresis
-		4.3.1 Maintain 1 queue for strong edges to be visited,
-			another list of visited strong edges
-		4.3.2 Whilst the to be visited queue is not empty, pop and visit
-		4.3.3 Check if the selected pixel is neighbouring a potential edge
-		4.3.4 If it is, add to the to be visited list and change to strong edge
-		4.3.5 Any remaining potential edges are NOT strong edges
+4: Hysteresis Thresholding [DONE]
 5: GUI
 	5.1 Requirements:
 		-Buttons for each stage
@@ -19,15 +10,16 @@ Plan:
 		-Save image - to be made possible after each stage
 		-Tick boxes to include/exclude stage - how the hell will that work???
 		-Timer
+		-Save all images at once - do a file structure thing to store all the images nicely, then add to design
+
 TODO:
 Urgent:
--Check analysis for ideas for GUI
--Try different ideas for threshold values - NEXT
--Change calculateThreshold function/module to be part of the threshold module
-	instead of in main program
--Fiddle with algorithm for hysteresis to get it to work better
--Revisit non-maximum suppression - can it be improved?
--Design GUI
+-Change g in convolution to k or kernel
+-Store binary images rather than 0s and 255s?
+-Turn images into a class
+-Change NMS to use components rather than tan.
+-Try other thresholding algorithms
+-GUI
 -Comment that shit:
 	-gaussian [DONE]
 	-convolution [DONE]
@@ -38,5 +30,6 @@ Urgent:
 	-sobel [DONE]
 Potential:
 -Change gaussian kernel radius to be 6*sigma
+-Fiddle with algorithm for hysteresis to get it to work better (?)
 -Investigate dynamic thresholds
 -Try using multiprocessing (maaaaaybe)

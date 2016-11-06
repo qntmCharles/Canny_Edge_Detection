@@ -13,8 +13,7 @@ def splitDictionary(dictionary,threshold):
             high_dict[key] = value
     return low_dict, high_dict
 
-def calculateThresholds(image):
-    #Create histogram
+def generateHistogram(image):
     hist={}
     for i in range(image.shape[0]):
         for j in range(image.shape[1]):
@@ -23,11 +22,13 @@ def calculateThresholds(image):
                 hist[val] += 1
             else:
                 hist[val] = 1
+    return hist
 
+def calculateThresholds(image):
+    #Generate histogram
+    hist = generateHistogram(image)
     #Create dictionary for between class variances
     bc_variances = {}
-    optimal_threshold = 0
-    bc_variance_max = 0
 
     #Test all possible thresholds
     for threshold in range(1,256):
@@ -76,8 +77,11 @@ def calculateThresholds(image):
         bc_variances[threshold] = between_class_variance
     #Find largest value in bc_variances, and store the threshold
     optimal_thres = max(bc_variances,key=bc_variances.get)
+    a=range(1,256)
+    values = [bc_variances[i] for i in range(1,256)]
+    plt.plot(a,values)
+    plt.show()
     print(optimal_thres)
-
     #Return threshold with optimal between class variance
     #plt.bar(hist.keys(),hist.values(),1)
     #plt.plot((optimal_thres,optimal_thres),(0,max(hist.values())),'r-')
@@ -85,9 +89,8 @@ def calculateThresholds(image):
     return optimal_thres
 
 def threshold_image(image,low,high):
-    print(np.max(image))
-    print(np.min(image))
     output = np.zeros(image.shape)
+
     for i in range(image.shape[0]):
         for j in range(image.shape[1]):
             if image[i][j] >= high:
@@ -98,4 +101,7 @@ def threshold_image(image,low,high):
                 output[i][j] = 128
     return output
 
-
+def threshold(image,suppressedImage):
+    t = 120 # calculateThresholds(suppressedImage)
+    output = threshold_image(suppressedImage,0.05*t,0.3*t)
+    return output
