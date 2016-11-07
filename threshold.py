@@ -3,30 +3,50 @@ from matplotlib import pyplot as plt
 import numpy as np
 import math
 
+#Function to split a single dictionary into two, given a threshold
 def splitDictionary(dictionary,threshold):
+    #Initialise dictionaries
     low_dict = {}
     high_dict = {}
+
+    #For all the key, value pairs in the input dictionary
     for key, value in dictionary.items():
+        #If value is less than the split threshold, add it to low_dict
         if value < threshold:
             low_dict[key] = value
+        #Otherwise, add it to high_dict
         else:
             high_dict[key] = value
+
+    #Return the two new dictionaries
     return low_dict, high_dict
 
+#Function to generate a histogram from a given image array
 def generateHistogram(image):
+    #Initialise dictionary
     hist={}
+
+    #For all the pixels in the image
     for i in range(image.shape[0]):
         for j in range(image.shape[1]):
+            #Value is floor of pixel value
             val = math.floor(image[i][j])
+            #If value not already in histogram, add it
             if val in hist:
                 hist[val] += 1
+            #Otherwise, increment it
             else:
                 hist[val] = 1
+
+    #Return generated histogram
     return hist
 
+
+#Optimal threshold calculation function, using otsu's method
 def calculateThresholds(image):
     #Generate histogram
     hist = generateHistogram(image)
+
     #Create dictionary for between class variances
     bc_variances = {}
 
@@ -75,6 +95,7 @@ def calculateThresholds(image):
         between_class_variance = background_weight * foreground_weight * (
                 background_mean - foreground_mean)**2
         bc_variances[threshold] = between_class_variance
+
     #Find largest value in bc_variances, and store the threshold
     optimal_thres = max(bc_variances,key=bc_variances.get)
     a=range(1,256)
@@ -82,26 +103,40 @@ def calculateThresholds(image):
     plt.plot(a,values)
     plt.show()
     print(optimal_thres)
-    #Return threshold with optimal between class variance
     #plt.bar(hist.keys(),hist.values(),1)
     #plt.plot((optimal_thres,optimal_thres),(0,max(hist.values())),'r-')
     #plt.show()
+
+    #Return threshold with optimal between class variance
     return optimal_thres
 
+#Thresholding function
 def threshold_image(image,low,high):
+    #Initialise output array
     output = np.zeros(image.shape)
 
+    #For all pixels in the image
     for i in range(image.shape[0]):
         for j in range(image.shape[1]):
+            #If above the high threshold, the output pixel gets 255
             if image[i][j] >= high:
                 output[i][j] = 255
+            #If below the low threshold, the output pixel gets 0
             elif image[i][j] < low:
                 output[i][j] = 0
+            #Otherwise, the output pixel gets 128
             else:
                 output[i][j] = 128
+
+    #Return thresholded image
     return output
 
+#Interface function, to interact with main program
 def threshold(image,suppressedImage):
+    #Calculate main threshold
     t = 120 # calculateThresholds(suppressedImage)
+    #Threshold the image using high and low threshold
     output = threshold_image(suppressedImage,0.05*t,0.3*t)
+
+    #Return thresholded image
     return output

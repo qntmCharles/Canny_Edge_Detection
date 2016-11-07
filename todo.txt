@@ -16,18 +16,16 @@ TODO:
 Urgent:
 -Change g in convolution to k or kernel
 -Store binary images rather than 0s and 255s?
--Turn images into a class
--Change NMS to use components rather than tan.
--Try other thresholding algorithms
+-Turn images into a class: DONE. Need to change all the modules into methods and then take self, an Imaage obj, and take what they need.
 -GUI
 -Comment that shit:
 	-gaussian [DONE]
 	-convolution [DONE]
 	-nms - ugh do I have to?
 	-main
-	-the others
-	-plot [DONE]
 	-sobel [DONE]
+	-hysteresis
+	-threshold [DONE]
 Potential:
 -Change gaussian kernel radius to be 6*sigma
 -Fiddle with algorithm for hysteresis to get it to work better (?)
