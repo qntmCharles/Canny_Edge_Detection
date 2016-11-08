@@ -16,7 +16,8 @@ TODO:
 Urgent:
 -Change g in convolution to k or kernel
 -Store binary images rather than 0s and 255s?
--Turn images into a class: DONE. Need to change all the modules into methods and then take self, an Imaage obj, and take what they need.
+-Turn images into a class: DONE. Need to change all the modules into methods and then take self, an Image obj, and take what they need.
+-Change queue to be more like an actual queue: retain all things entered into, just change pointer.
 -GUI
 -Comment that shit:
 	-gaussian [DONE]
@@ -24,7 +25,7 @@ Urgent:
 	-nms - ugh do I have to?
 	-main
 	-sobel [DONE]
-	-hysteresis
+	-hysteresis [DONE]
 	-threshold [DONE]
 Potential:
 -Change gaussian kernel radius to be 6*sigma
