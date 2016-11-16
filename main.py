@@ -82,13 +82,15 @@ def main():
     print('Sobel convolution complete!')
     print('Performing non maximum suppression...')
     suppressed_image = nonMaximumSuppression(sobelGradient,horiz,vert,sobelDirection)
-    a=input()
-    print(np.max(suppressed_image))
-    im.fromarray(suppressed_image).show()
+    choice = str(input('Show suppressed image? (y/n)'))
+    if choice == 'y':
+        im.fromarray(suppressed_image).show()
     print('Non maximum suppression complete!')
-    """h = generateHistogram(suppressed_image)
-    plt.bar(h.keys(),h.values(),1)
-    plt.show()"""
+    choice = str(input('Show suppressed image histogram? (y/n)'))
+    if choice == 'y':
+        h = generateHistogram(suppressed_image)
+        plt.bar(h.keys(),h.values(),1)
+        plt.show()
     print('Thresholding image...')
     thresholded_image = threshold(I,suppressed_image)
     print('Thresholding complete!')
@@ -96,7 +98,9 @@ def main():
     print('Performing threshold hysteresis...')
     final_image = hysteresis(thresholded_image)
     print('Threshold hysteresis complete!')
-    im.fromarray(final_image).show()
+    choice = str(input('Show final image? (y/n)'))
+    if choice == 'y':
+        im.fromarray(final_image).show()
 
 
 if __name__ == '__main__':

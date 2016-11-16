@@ -98,14 +98,14 @@ def calculateThresholds(image):
 
     #Find largest value in bc_variances, and store the threshold
     optimal_thres = max(bc_variances,key=bc_variances.get)
-    choice = chr(input('Show threshold selection plot? (y/n)'))
+    choice = str(input('Show threshold selection plot? (y/n)'))
     if choice == 'y':
         a=range(1,256)
         values = [bc_variances[i] for i in range(1,256)]
         plt.plot(a,values)
         plt.show()
     print('Optimal threshold: ',optimal_thres)
-    choice = chr(input('Show histogram? (y/n)'))
+    choice = str(input('Show histogram? (y/n)'))
     if choice == 'y':
         plt.bar(hist.keys(),hist.values(),1)
         plt.plot((optimal_thres,optimal_thres),(0,max(hist.values())),'r-')
