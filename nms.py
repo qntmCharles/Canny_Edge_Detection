@@ -1,166 +1,214 @@
 from __future__ import division
 import math
+from decimal import *
 import numpy as np
+getcontext().prec=15
 
 def checkExists(coordinates,shape):
     for i in range(len(coordinates)):
-            if coordinates[i] > shape[i]-1:
-                return False
+        if coordinates[i] > shape[i%2] - 1:
+            return False
     return True
 
-def nonMaximumSuppression(magnitude,direction):
-    #Create empty array of zeros to contain result
-    output = np.zeros(magnitude.shape)
+def interpolate(hVector,vVector,x1,x2):
+    #x1 is bottom
+    difference = (vVector/hVector)*abs(x2-x1)
+    if x2 > x1:
+        result = x1+difference
+    else:
+        result = x1-difference
 
-    #To shorten and neaten code;
+    if (result > max(x1,x2)) and not (math.isclose(max(x1,x2),result)):
+        print('Error')
+    elif (result < min(x1,x2)) and not (math.isclose(min(x1,x2),result)):
+        print('Error')
+    else:
+        return result
+
+def nonMaximumSuppression(mag,magH,magV,direction):
+    output = np.zeros(direction.shape)
+
     pi = math.pi
 
-    #Iterate over image
-    for y in range(magnitude.shape[0]):
-        for x in range(magnitude.shape[1]):
-            #To shorten and neaten code;
-            theta = direction[y][x]
-            shape = magnitude.shape
+    for y in range(direction.shape[0]):
+        for x in range(direction.shape[1]):
+            angle = direction[y][x]
+            h = magH[y][x]
+            v = magV[y][x]
+            shape = mag.shape
 
-            if ((theta <= pi/4) and (theta > 0)) or (
-                    (theta <= -3*pi/4) and (theta > -pi)):
+            if angle == pi:
+                index = 7
+            else:
+                index=math.floor((angle+pi)/(2*pi)*8)
 
-                if checkExists((y-1,x+1),shape) and checkExists((y-1,x+1),shape):
-                    #Calculate interpolated gradient /above/ the pixel
-                    #Case: higher gradient > lower gradient
-                    if magnitude[y-1][x+1] >= magnitude[y][x+1]:
-                        upper_gradient = math.tan(theta)*(
-                            magnitude[y-1][x+1] - magnitude[y][x+1]) + (
-                                magnitude[y][x+1])
+            #\   |   /
+            # \ 6|5 /
+            # 7\ | /4
+            #---------
+            # 0/ | \3
+            # / 1|2 \
+            #/   |   \
 
-                    #Case: lower gradient > higher gradient
+
+            if index == 0:
+                if checkExists((y,x-1,y+1,x-1),shape):
+                    pixels=(mag[y][x-1],mag[y+1][x-1])
+                    if pixels[0] == pixels[1]:
+                        gradient1 = pixels[0]
                     else:
-                        upper_gradient = (1-math.tan(theta))*(
-                            magnitude[y][x+1] - magnitude[y-1][x+1]) + (
-                                magnitude[y-1][x+1])
+                        gradient1 = interpolate(-h,-v,pixels[0],pixels[1])
                 else:
-                    upper_gradient = None
+                    gradient1 = 0
 
-                if checkExists((y+1,x-1),shape) and checkExists((y,x-1),shape):
-                    #Calculate inteporlated gradient /above/ the pixel
-                    #Case: lower gradient > higher gradient
-                    if magnitude[y+1][x-1] >= magnitude[y][x-1]:
-                        lower_gradient = math.tan(theta)*(
-                            magnitude[y+1][x-1] - magnitude[y][x-1]) + (
-                                magnitude[y][x-1])
-
-                    #Case: higher gradient > lower gradient
+                if checkExists((y,x+1,y-1,x+1),shape):
+                    pixels=(mag[y][x+1],mag[y-1][x+1])
+                    if pixels[0] == pixels[1]:
+                        gradient2 = pixels[0]
                     else:
-                        lower_gradient = (1-math.tan(theta))*(
-                            magnitude[y][x-1] - magnitude[y+1][x-1]) + (
-                                magnitude[y+1][x-1])
+                        gradient2 = interpolate(-h,-v,pixels[0],pixels[1])
                 else:
-                    lower_gradient = None
+                    gradient2 = 0
 
-
-            elif ((theta <= pi/2) and (theta > pi/4)) or (
-                    (theta <= -pi) and (theta > -3*pi/4)):
-
-                if checkExists((y-1,x+1),shape) and checkExists((y-1,x),shape):
-                    if magnitude[y-1][x+1] >= magnitude[y-1][x]:
-                        upper_gradient = math.tan(pi/2-theta)*(
-                            magnitude[y-1][x+1] - magnitude[y-1][x]) + (
-                                magnitude[y-1][x])
-
+            elif index == 1:
+                if checkExists((y+1,x,y+1,x-1),shape):
+                    pixels=(mag[y+1][x],mag[y+1][x-1])
+                    if pixels[0] == pixels[1]:
+                        gradient1 = pixels[0]
                     else:
-                        upper_gradient = (1-math.tan(pi/2-theta))*(
-                            magnitude[y-1][x] - magnitude[y-1][x+1]) + (
-                                magnitude[y-1][x+1])
+                        gradient1 = interpolate(-v,-h,pixels[0],pixels[1])
                 else:
-                    upper_gradient = None
+                    gradient1 = 0
 
-                if checkExists((y+1,x-1),shape) and checkExists((y+1,x),shape):
-                    if magnitude[y+1][x-1] >= magnitude[y+1][x]:
-                        lower_gradient = math.tan(pi/2-theta)*(
-                            magnitude[y+1][x-1] - magnitude[y+1][x]) + (
-                                magnitude[y+1][x])
-
+                if checkExists((y-1,x,y-1,x+1),shape):
+                    pixels=(mag[y-1][x],mag[y-1][x+1])
+                    if pixels[0] == pixels[1]:
+                        gradient2 = pixels[0]
                     else:
-                        lower_gradient = (1-math.tan(pi/2-theta))*(
-                            magnitude[y+1][x] - magnitude[y+1][x-1]) + (
-                                magnitude[y+1][x-1])
+                        gradient2 = interpolate(-v,-h,pixels[0],pixels[1])
                 else:
-                    lower_gradient = None
+                    gradient2 = 0
 
-            elif ((theta <= 0) and (theta > -pi/4)) or (
-                    (theta <= pi) and (theta > 3*pi/4)):
-
-                if checkExists((y+1,x+1),shape) and checkExists((y,x+1),shape):
-                    if magnitude[y+1][x+1] >= magnitude[y][x+1]:
-                        lower_gradient = math.tan(-theta)*(
-                            magnitude[y+1][x+1] - magnitude[y][x+1]) + (
-                                magnitude[y][x+1])
-
+            elif index == 2:
+                if checkExists((y+1,x,y+1,x+1),shape):
+                    pixels=(mag[y+1][x],mag[y+1][x+1])
+                    if pixels[0] == pixels[1]:
+                        gradient1 = pixels[0]
                     else:
-                        lower_gradient = (1-math.tan(-theta))*(
-                            magnitude[y][x+1] - magnitude[y+1][x+1]) + (
-                                magnitude[y+1][x+1])
+                        gradient1 = interpolate(-v,h,pixels[0],pixels[1])
                 else:
-                    lower_gradient = None
+                    gradient1 = 0
 
-                if checkExists((y-1,x-1),shape) and checkExists((y,x-1),shape):
-                    if magnitude[y-1][x-1] >= magnitude[y][x-1]:
-                        upper_gradient = math.tan(-theta)*(
-                            magnitude[y-1][x-1] - magnitude[y][x-1]) + (
-                                magnitude[y][x-1])
-
+                if checkExists((y-1,x,y-1,x-1),shape):
+                    pixels=(mag[y-1][x],mag[y-1][x-1])
+                    if pixels[0] == pixels[1]:
+                        gradient2 = pixels[0]
                     else:
-                        upper_gradient = (1-math.tan(-theta))*(
-                            magnitude[y][x-1] - magnitude[y-1][x-1]) + (
-                                magnitude[y-1][x-1])
+                        gradient2 = interpolate(-v,h,pixels[0],pixels[1])
                 else:
-                    upper_gradient = None
+                    gradient2 = 0
 
-            elif ((theta <= -pi/4) and (theta > -pi/2)) or (
-                    (theta <= 3*pi/4) and (theta > pi/2)):
-
-                if checkExists((y+1,x+1),shape) and checkExists((y+1,x),shape):
-                    if magnitude[y+1][x+1] >= magnitude[y+1][x]:
-                        lower_gradient = math.tan(pi/2 + theta)*(
-                           magnitude[y+1][x+1] - magnitude[y+1][x]) + (
-                               magnitude[y+1][x])
-
+            elif index == 3:
+                if checkExists((y,x+1,y+1,x+1),shape):
+                    pixels=(mag[y][x+1],mag[y+1][x+1])
+                    if pixels[0] == pixels[1]:
+                        gradient1 = pixels[0]
                     else:
-                        lower_gradient = (1-math.tan(pi/2+theta))*(
-                            magnitude[y+1][x] - magnitude[y+1][x+1]) + (
-                                magnitude[y+1][x+1])
+                        gradient1 = interpolate(h,-v,pixels[0],pixels[1])
                 else:
-                    lower_gradient = None
+                    gradient1 = 0
 
-                if checkExists((y-1,x-1),shape) and checkExists((y-1,x),shape):
-                    if magnitude[y-1][x-1] >= magnitude[y-1][x]:
-                        upper_gradient = math.tan(pi/2+theta)*(
-                            magnitude[y-1][x-1] - magnitude[y-1][x]) + (
-                                magnitude[y-1][x])
-
+                if checkExists((y,x-1,y-1,x-1),shape):
+                    pixels=(mag[y][x-1],mag[y-1][x-1])
+                    if pixels[0] == pixels[1]:
+                        gradient2 = pixels[0]
                     else:
-                        upper_gradient =  (1-math.tan(pi/2+theta))*(
-                            magnitude[y-1][x] - magnitude[y-1][x-1]) + (
-                                magnitude[y-1][x-1])
+                        gradient2 = interpolate(h,-v,pixels[0],pixels[1])
                 else:
-                    upper_gradient = None
+                    gradient2 = 0
 
-            #Need to deal with upper_gradient or lower_gradient being None
-            if (upper_gradient == None) and (lower_gradient != None):
-                if magnitude[y][x] >= lower_gradient:
-                    output[y][x] = magnitude[y][x]
+            elif index == 4:
+                if checkExists((y,x+1,y-1,x+1),shape):
+                    pixels=(mag[y][x+1],mag[y-1][x+1])
+                    if pixels[0] == pixels[1]:
+                        gradient1 = pixels[0]
+                    else:
+                        gradient1 = interpolate(h,v,pixels[0],pixels[1])
                 else:
-                    output[y][x] = 0
-            elif (upper_gradient != None) and (lower_gradient == None):
-                if magnitude[y][x] >= upper_gradient:
-                    output[y][x] = magnitude[y][x]
+                    gradient1 = 0
+
+                if checkExists((y,x-1,y+1,x-1),shape):
+                    pixels=(mag[y][x-1],mag[y+1][x-1])
+                    if pixels[0] == pixels[1]:
+                        gradient2 = pixels[0]
+                    else:
+                        gradient2 = interpolate(h,v,pixels[0],pixels[1])
                 else:
-                    output[y][x] = 0
-            elif (upper_gradient == None) and (lower_gradient == None):
-                output[y][x] = magnitude[y][x]
-            elif (magnitude[y][x] >= upper_gradient) and (
-                magnitude[y][x] >= lower_gradient):
-                output[y][x] = magnitude[y][x]
+                    gradient2 = 0
+
+            elif index == 5:
+                if checkExists((y-1,x,y-1,x+1),shape):
+                    pixels=(mag[y-1][x],mag[y-1][x+1])
+                    if pixels[0] == pixels[1]:
+                        gradient1 = pixels[0]
+                    else:
+                        gradient1 = interpolate(v,h,pixels[0],pixels[1])
+                else:
+                    gradient1 = 0
+
+                if checkExists((y+1,x,y+1,x-1),shape):
+                    pixels=(mag[y+1][x],mag[y+1][x-1])
+                    if pixels[0] == pixels[1]:
+                        gradient2 = pixels[0]
+                    else:
+                        gradient2 = interpolate(v,h,pixels[0],pixels[1])
+                else:
+                    gradient2 = 0
+
+            elif index == 6:
+                if checkExists((y-1,x,y-1,x-1),shape):
+                    pixels=(mag[y-1][x],mag[y-1][x-1])
+                    if pixels[0] == pixels[1]:
+                        gradient1 = pixels[0]
+                    else:
+                        gradient1 = interpolate(v,-h,pixels[0],pixels[1])
+                else:
+                    gradient1 = 0
+
+                if checkExists((y+1,x,y+1,x+1),shape):
+                    pixels=(mag[y+1][x],mag[y+1][x+1])
+                    if pixels[0] == pixels[1]:
+                        gradient2 = pixels[0]
+                    else:
+                        gradient2 = interpolate(v,-h,pixels[0],pixels[1])
+                else:
+                    gradient2 = 0
+
+            elif index == 7:
+                if checkExists((y,x-1,y-1,x-1),shape):
+                    pixels=(mag[y][x-1],mag[y-1][x-1])
+                    if pixels[0] == pixels[1]:
+                        gradient1 = pixels[0]
+                    else:
+                        gradient1 = interpolate(-h,v,pixels[0],pixels[1])
+                else:
+                    gradient1 = 0
+
+                if checkExists((y,x+1,y+1,x+1),shape):
+                    pixels=(mag[y][x+1],mag[y+1][x+1])
+                    if pixels[0] == pixels[1]:
+                        gradient2 = pixels[0]
+                    else:
+                        gradient2 = interpolate(-h,v,pixels[0],pixels[1])
+                else:
+                    gradient2 = 0
+
+            else:
+                print('Error: unclassified angle (',angle,')')
+
+            if (mag[y][x] >= gradient1) and (mag[y][x] >= gradient2):
+               output[y][x] = mag[y][x]
             else:
                 output[y][x] = 0
+
     return output

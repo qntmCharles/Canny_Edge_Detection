@@ -98,14 +98,18 @@ def calculateThresholds(image):
 
     #Find largest value in bc_variances, and store the threshold
     optimal_thres = max(bc_variances,key=bc_variances.get)
-    a=range(1,256)
-    values = [bc_variances[i] for i in range(1,256)]
-    plt.plot(a,values)
-    plt.show()
-    print(optimal_thres)
-    #plt.bar(hist.keys(),hist.values(),1)
-    #plt.plot((optimal_thres,optimal_thres),(0,max(hist.values())),'r-')
-    #plt.show()
+    choice = chr(input('Show threshold selection plot? (y/n)'))
+    if choice == 'y':
+        a=range(1,256)
+        values = [bc_variances[i] for i in range(1,256)]
+        plt.plot(a,values)
+        plt.show()
+    print('Optimal threshold: ',optimal_thres)
+    choice = chr(input('Show histogram? (y/n)'))
+    if choice == 'y':
+        plt.bar(hist.keys(),hist.values(),1)
+        plt.plot((optimal_thres,optimal_thres),(0,max(hist.values())),'r-')
+        plt.show()
 
     #Return threshold with optimal between class variance
     return optimal_thres
@@ -134,9 +138,9 @@ def threshold_image(image,low,high):
 #Interface function, to interact with main program
 def threshold(image,suppressedImage):
     #Calculate main threshold
-    t = 120 # calculateThresholds(suppressedImage)
+    t = calculateThresholds(suppressedImage)
     #Threshold the image using high and low threshold
-    output = threshold_image(suppressedImage,0.05*t,0.3*t)
+    output = threshold_image(suppressedImage,0.5*t,t)
 
     #Return thresholded image
     return output

@@ -21,6 +21,7 @@ def sobel(image):
     #Create arrays of zeros
     gradient = np.zeros(image.shape)
     direction = np.zeros(image.shape).astype(np.str)
+
     #Iterate over image
     for y in range(image.shape[0]):
         for x in range(image.shape[1]):
@@ -29,7 +30,7 @@ def sobel(image):
 
             #If horizontal component isn't 0, calculate gradient direction
             if horizontal[y][x] != 0:
-                direction[y][x] = math.atan(vertical[y][x]/horizontal[y][x])
+                direction[y][x] = math.atan2(vertical[y][x],horizontal[y][x])
             #If horizontal component is 0, then direction is either +pi or -pi
             else:
                 if vertical[y][x] >= 0:
@@ -40,5 +41,5 @@ def sobel(image):
     #normalise gradient so that the image isn't darkened
     normalised_gradient = 255.*np.absolute(gradient)/np.max(gradient)
 
-    return normalised_gradient, direction
+    return normalised_gradient, direction, horizontal, vertical
 

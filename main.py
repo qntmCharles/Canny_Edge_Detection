@@ -54,23 +54,41 @@ class Image():
             str += 'Final: unassigned'
         return str
 
+    def gaussian_(self,sigma,width):
+        self.gblur = gaussian(sigma,width,self.original)
+        #Is it possible to pass an object to a function called in one of it's methods?
+    def sobel_(self):
+        self.smagnitude,self.sdirection = sobel(self.gblur)
+
+    def nms_(self):
+        pass
+
+    def threshold_(self):
+        pass
+
+    def hysteresis_(self):
+        pass
+
 def main():
     I = Image(np.asarray(im.open('test.png').convert('L'),dtype=np.float32))
     print('Performing Gaussian blur...')
-    gaussian_result = gaussian(0.5,5,I)
+    gaussian_result = gaussian(0.5,5,I.original)
     print('Gaussian blur complete!')
     #Image.fromarray(gaussian_result.astype(np.uint8)).show()
     print('Performing Sobel convolution...')
-    sobelGradient,sobelDirection = sobel(gaussian_result)
+    sobelGradient,sobelDirection,horiz,vert = sobel(gaussian_result)
     sobelDirection = sobelDirection.astype('float')
     sobelGradient = sobelGradient.astype('float')
     print('Sobel convolution complete!')
     print('Performing non maximum suppression...')
-    suppressed_image = nonMaximumSuppression(sobelGradient,sobelDirection)
+    suppressed_image = nonMaximumSuppression(sobelGradient,horiz,vert,sobelDirection)
+    a=input()
+    print(np.max(suppressed_image))
+    im.fromarray(suppressed_image).show()
     print('Non maximum suppression complete!')
-    h = generateHistogram(suppressed_image)
+    """h = generateHistogram(suppressed_image)
     plt.bar(h.keys(),h.values(),1)
-    plt.show()
+    plt.show()"""
     print('Thresholding image...')
     thresholded_image = threshold(I,suppressed_image)
     print('Thresholding complete!')

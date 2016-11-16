@@ -14,7 +14,8 @@ class Queue():
         string = ''
 
         #Convert each element into a co-ordinate representation
-        for element in self.elements:
+        for i in range(self.pointer,len(self.elements)+1):#test this
+            element = elements[i]
             string += '('+str(element[0])+','+str(element[1])+'), '
 
         #Return the generated string
@@ -26,12 +27,9 @@ class Queue():
 
     def dequeue(self):
         #Get the first element of the queue
-        val = self.elements[0]
-        #Remove the first element
-        self.elements = self.elements[1:]
-        return val
+        return self.elements.pop(0)
 
-    def empty(self):
+    def isEmpty(self):
         #If the length of the elements list is 0, it's empty
         if len(self.elements) == 0:
             return True
@@ -52,7 +50,7 @@ def hysteresis(image):
                 edges.append((i,j))
                 toVisit.enqueue((i,j))
                 #Go through queue until empty
-                while not toVisit.empty():
+                while not toVisit.isEmpty():
                     #Dequeue first element
                     coord = toVisit.dequeue()
                     #Check in a 3*3 area around the pixel for connectivity
