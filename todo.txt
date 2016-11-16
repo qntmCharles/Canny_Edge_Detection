@@ -13,7 +13,6 @@ Plan:
 		-Save all images at once - do a file structure thing to store all the images nicely, then add to design
 
 TODO:
--Change g in convolution to k or kernel
 -Store binary images rather than 0s and 255s?
 -Turn images into a class: DONE. Need to change all the modules into methods and then take self, an Image obj, and take what they need.
 -GUI
