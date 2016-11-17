@@ -58,17 +58,55 @@ class Image():
         self.gblur = gaussian(sigma,width,self.original)
         #Is it possible to pass an object to a function called in one of it's methods?
     def sobel_(self):
-        self.smagnitude,self.sdirection = sobel(self.gblur)
+        self.smagnitude,self.sdirection,self.shgradient,self.svgradient = sobel(self.gblur)
+        self.smagnitude = self.smagnitude.astype('float')
+        self.sdirection = self.sdirection.astype('float')
 
     def nms_(self):
-        pass
+        self.suppressed = nonMaximumSuppression(self.smagnitude,self.shgradient,self.svgradient,self.sdirection)
 
     def threshold_(self):
-        pass
+        self.thresholded = threshold(self.original,self.suppressed)
 
     def hysteresis_(self):
-        pass
+        self.final = hysteresis(self.thresholded)
 
+def main():
+    I = Image(np.asarray(im.open('test.png').convert('L'),dtype=np.float32))
+    print('Performing Gaussian blur...')
+    I.gaussian_(0.5,5)
+    print('Gaussian blur complete!')
+    #Image.fromarray(gaussian_result.astype(np.uint8)).show()
+    print('Performing Sobel convolution...')
+    I.sobel_()
+    print('Sobel convolution complete!')
+    print('Performing non maximum suppression...')
+    I.nms_()
+    choice = str(input('Show suppressed image? (y/n)'))
+    if choice == 'y':
+        im.fromarray(I.suppressed).show()
+    print('Non maximum suppression complete!')
+    choice = str(input('Show suppressed image histogram? (y/n)'))
+    if choice == 'y':
+        h = generateHistogram(I.suppressed)
+        plt.bar(h.keys(),h.values(),1)
+        plt.show()
+    print('Thresholding image...')
+    I.threshold_()
+    print('Thresholding complete!')
+    #Image.fromarray(thresholded_image).show()
+    print('Performing threshold hysteresis...')
+    I.hysteresis_()
+    print('Threshold hysteresis complete!')
+    choice = str(input('Show final image? (y/n)'))
+    if choice == 'y':
+        im.fromarray(I.final).show()
+
+
+if __name__ == '__main__':
+    main()
+
+"""
 def main():
     I = Image(np.asarray(im.open('test.png').convert('L'),dtype=np.float32))
     print('Performing Gaussian blur...')
@@ -101,12 +139,7 @@ def main():
     choice = str(input('Show final image? (y/n)'))
     if choice == 'y':
         im.fromarray(final_image).show()
-
-
-if __name__ == '__main__':
-    main()
-
-
+"""
 #########
 """sobel (works - just doesn't look as it will at the end)
 I = np.asarray(Image.open('test.png').convert('L'),dtype=np.float32)

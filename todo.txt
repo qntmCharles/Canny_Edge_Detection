@@ -14,7 +14,7 @@ Plan:
 
 TODO:
 -Store binary images rather than 0s and 255s?
--Turn images into a class: DONE. Need to change all the modules into methods and then take self, an Image obj, and take what they need.
+-Data storage
 -GUI
 -Fix thresholding:
 	-Can I threshold the image differently to get better thresholds
