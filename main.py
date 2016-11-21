@@ -66,7 +66,7 @@ class Image():
         self.suppressed = nonMaximumSuppression(self.smagnitude,self.shgradient,self.svgradient,self.sdirection)
 
     def threshold_(self):
-        self.thresholded = threshold(self.original,self.suppressed)
+        self.thresholded = threshold(self.original,self.smagnitude,self.suppressed)
 
     def hysteresis_(self):
         self.final = hysteresis(self.thresholded)
@@ -74,17 +74,28 @@ class Image():
 def main():
     I = Image(np.asarray(im.open('test.png').convert('L'),dtype=np.float32))
     print('Performing Gaussian blur...')
-    I.gaussian_(0.5,5)
+    I.gaussian_(1,5)
     print('Gaussian blur complete!')
+    choice = str(input('Show blurred image? (y/n)'))
+    if choice == 'y':
+        im.fromarray(I.gblur).show()
+    input()
     #Image.fromarray(gaussian_result.astype(np.uint8)).show()
     print('Performing Sobel convolution...')
     I.sobel_()
     print('Sobel convolution complete!')
+    choice = str(input('Show all sobel results? (y/n)'))
+    if choice == 'y':
+        im.fromarray(I.shgradient).show()
+        im.fromarray(I.svgradient).show()
+        im.fromarray(I.smagnitude).show()
+    input()
     print('Performing non maximum suppression...')
     I.nms_()
     choice = str(input('Show suppressed image? (y/n)'))
     if choice == 'y':
         im.fromarray(I.suppressed).show()
+    input()
     print('Non maximum suppression complete!')
     choice = str(input('Show suppressed image histogram? (y/n)'))
     if choice == 'y':
@@ -94,13 +105,15 @@ def main():
     print('Thresholding image...')
     I.threshold_()
     print('Thresholding complete!')
+    choice = str(input('Show thresholded image? (y/n)'))
+    if choice == 'y':
+        im.fromarray(I.thresholded).show()
+    input()
     #Image.fromarray(thresholded_image).show()
     print('Performing threshold hysteresis...')
     I.hysteresis_()
     print('Threshold hysteresis complete!')
-    choice = str(input('Show final image? (y/n)'))
-    if choice == 'y':
-        im.fromarray(I.final).show()
+    im.fromarray(I.final).show()
 
 
 if __name__ == '__main__':

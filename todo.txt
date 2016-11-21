@@ -15,7 +15,17 @@ Plan:
 TODO:
 -Store binary images rather than 0s and 255s?
 -Data storage
--GUI
+-Compare to code bookmarked on Chrome:
+	-Does NMS give the same result - NO
+	-Connected component detection - recursive - is it faster?
+	-Does my program actually remove weak edges that are left over?
+	-Compare entire program - where is it different and is it better
+	-Does thresholding method work better (probably, try it) kindaaaa?
+-Fix NMS, or whatever else is wrong
+-Try old NMS algorithm to see if it actually works
+-GUI:
+	-There should be a way to update multiple QLabels from the getFile function:
+	look up slots and signals and work out how.
 -Fix thresholding:
 	-Can I threshold the image differently to get better thresholds
 	-Does the function work properly?

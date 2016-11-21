@@ -2,7 +2,6 @@ from __future__ import division
 import numpy as np
 import math
 from matplotlib import pyplot as plt
-
 from convolution import convolution
 
 def sobel(image):
@@ -15,8 +14,8 @@ def sobel(image):
                                  [ 2, 0,-2],
                                  [ 1, 0,-1]])
     #Perform convolution using kernels
-    horizontal = convolution(image, vertical_kernel)
-    vertical = convolution(image, horizontal_kernel)
+    horizontal = convolution(image, horizontal_kernel)
+    vertical = convolution(image, vertical_kernel)
 
     #Create arrays of zeros
     gradient = np.zeros(image.shape)

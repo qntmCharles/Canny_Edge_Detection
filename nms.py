@@ -205,10 +205,22 @@ def nonMaximumSuppression(mag,magH,magV,direction):
 
             else:
                 print('Error: unclassified angle (',angle,')')
-
-            if (mag[y][x] >= gradient1) and (mag[y][x] >= gradient2):
-               output[y][x] = mag[y][x]
+            if (gradient1 != None) and (gradient2 != None):
+                if (mag[y][x] >= gradient1) and (mag[y][x] >= gradient2):
+                   output[y][x] = mag[y][x]
+                else:
+                    output[y][x] = 0
+            elif gradient1 != None:
+                if mag[y][x] >= gradient1:
+                    output[y][x] = mag[y][x]
+                else:
+                    output[y][x] = 0
+            elif gradient2 != None:
+                if mag[y][x] >= gradient2:
+                    output[y][x] = mag[y][x]
+                else:
+                    output[y][x] = 0
             else:
-                output[y][x] = 0
+                output[y][x] = mag[y][x]
 
     return output
