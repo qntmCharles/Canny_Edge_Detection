@@ -27,7 +27,9 @@ TODO:
 -Fix NMS, or whatever else is wrong
 -Try old NMS algorithm to see if it actually works
 -GUI:
-	-Use worker thread to do the processing and background thread to update the GUI
+	-Use worker thread to do the processing and background thread to update the GUI (done mostly)
+	-Look at QFocusEvent in order to maintain focus on the app, so buttons can be clicked 
+	(I think that's what it does, idk)
 	-Add a 'load from current process' for options after gblur, 
 	so that you can go straight from gblur to sobel (for example) 
 	without having to save and then load

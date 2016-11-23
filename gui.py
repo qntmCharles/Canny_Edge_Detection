@@ -1,4 +1,4 @@
-import sys
+import sys, time
 from PyQt4 import QtCore, QtGui
 from PIL import Image as im
 from main import Image
@@ -218,6 +218,7 @@ class CannyWindow(QtGui.QWidget):
 
         QtCore.QObject.connect(self.backButton, QtCore.SIGNAL('clicked()'), self.parent().fullCannyHideFunction)
         QtCore.QObject.connect(self.openFileButton, QtCore.SIGNAL('clicked()'), self.openFileFunction)
+        QtCore.QObject.connect(self.startButton, QtCore.SIGNAL('clicked()'), self.startFunction)
 
     def layout(self):
         gridLayout = QtGui.QGridLayout()
@@ -242,6 +243,18 @@ class CannyWindow(QtGui.QWidget):
 
         self.setLayout(gridLayout)
 
+    def startFunction(self):
+        #Define threads
+        worker = WorkerThread(self)
+        update = BackgroundThread(worker, self)
+
+        #Start threads
+        worker.start()
+        update.start()
+
+        worker.wait()
+
+
     def openFileFunction(self):
         #Open file dialog and get selected filepath
         filepath = QtGui.QFileDialog.getOpenFileName(self, 'Open file', '~', 'Image files (*.jpg *.gif *.bmp *.png)')
@@ -252,6 +265,38 @@ class CannyWindow(QtGui.QWidget):
             self.parent().parent().fileStatusString = 'File: '+str(filepath.split('/')[-1])
             self.fileStatusLabel.setText(self.parent().parent().fileStatusString)
             self.parent().parent().optionsWidget.fileStatusLabel.setText(self.parent().parent().fileStatusString)
+
+class WorkerThread(QtCore.QThread):
+    '''Handles processing and functionality'''
+    def __init__(self, parent):
+        super(WorkerThread, self).__init__(parent)
+
+        self.running = True
+
+    def run(self):
+        '''Starts the thread doing work when inbuilt start() is called'''
+        #Do stuff here
+        #Test below
+        for i in range(500):
+            print(i)
+            time.sleep(0.1)
+
+        self.running = False
+
+class BackgroundThread(QtCore.QThread):
+    '''Keeps the GUI responsive by updating the main loop'''
+    def __init__(self, worker, parent):
+        super(BackgroundThread, self).__init__(parent)
+
+        self.worker = worker #worker needs to be defined in main window, or somewhere
+
+    def run(self):
+        '''Starts the thread doing work when inbuilt start() is called'''
+
+        while self.worker.running:
+            App.processEvents()
+            print('Updating main loop')
+            time.sleep(0.1)
 
 class App(QtGui.QApplication):
     def __init__(self,*args):
