@@ -5,41 +5,45 @@ Plan:
 4: Hysteresis Thresholding [DONE]
 5: GUI
 	5.1 Requirements:
-		-Buttons for each stage
-		-Open image
-		-Save image - to be made possible after each stage
 		-Tick boxes to include/exclude stage - how the hell will that work???
 		-Timer
 		-Save all images at once - do a file structure thing to store all the images nicely, then add to design
 
 TODO:
 -Store binary images rather than 0s and 255s?
+
 -In write up:
 	-in HCI: gestalt principles of organisation
 	-in analysis research section: point out that thresholding hysteresis often split into two stages
+
 -Data storage
+
 -Compare to code bookmarked on Chrome:
-	-Does NMS give the same result - NO
+	-Does NMS give the same result - NO - try old NMS algorithm
 	-Connected component detection - recursive - is it faster?
 	-Does my program actually remove weak edges that are left over?
 	-Compare entire program - where is it different and is it better
 	-Does thresholding method work better (probably, try it) kindaaaa?
+
 -Fix NMS, or whatever else is wrong
--Try old NMS algorithm to see if it actually works
+	-Why are there still some interpolation errors
+
 -GUI:
-	-Use worker thread to do the processing and background thread to update the GUI (done mostly)
-	-Look at QFocusEvent in order to maintain focus on the app, so buttons can be clicked 
-	(I think that's what it does, idk)
-	-Add a 'load from current process' for options after gblur, 
+	-Save all button
+	-Set default keys e.g. esc to exit a dialog
+	-(in individual options) Add a 'load from current process' for options after gblur, 
 	so that you can go straight from gblur to sobel (for example) 
 	without having to save and then load
 	-Add a dropdown menu to select sigma and radius
-	-Add a dialog to tell you to load an image if not done when start is clicked
-	-Make the 'processing...' thing go ., .., ...,
+	Bugs:
+		-Cancelling, loading a new image, and then running causes errors: clock counts in twos, starts to terminate again
+		-Yeah it's seriously broken if you cancel and then restart...
+
 -Fix thresholding:
 	-Can I threshold the image differently to get better thresholds
 	-Does the function work properly?
 	-Are there better methods of thresholding
+
 -Comment that shit:
 	-gaussian [DONE]
 	-convolution [DONE]
@@ -48,8 +52,8 @@ TODO:
 	-sobel [DONE]
 	-hysteresis [DONE]
 	-threshold [DONE]
+
 Potential:
 -Change gaussian kernel radius to be 6*sigma
 -Fiddle with algorithm for hysteresis to get it to work better (?)
 -Investigate dynamic thresholds
--Try using multiprocessing (maaaaaybe)
