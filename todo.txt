@@ -15,6 +15,7 @@ TODO:
 -In write up:
 	-in HCI: gestalt principles of organisation
 	-in analysis research section: point out that thresholding hysteresis often split into two stages
+	-point out that progress bar is inferior to a timer - it is not known how much processing is needed so a progress bar is not suitable, timer lets you know it's still going
 
 -Data storage
 
@@ -29,8 +30,12 @@ TODO:
 	-Why are there still some interpolation errors
 
 -GUI:
-	-Save all button
+	-Refine open file button/method, make it only allow image files
+	-Connect up combo box for sigma & radius
 	-Set default keys e.g. esc to exit a dialog
+		-Ctrl+Q to exit gui
+		-Ctrl+O to open file
+		-Ctrl+S to start
 	-(in individual options) Add a 'load from current process' for options after gblur, 
 	so that you can go straight from gblur to sobel (for example) 
 	without having to save and then load

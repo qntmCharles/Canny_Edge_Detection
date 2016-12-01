@@ -222,7 +222,6 @@ class CannyWindow(QtGui.QWidget):
         self.showButton = QtGui.QPushButton('Show file')
         self.saveAllButton = QtGui.QPushButton('Save all')
 
-
         self.gblurLabel = QtGui.QLabel('Gaussian Blur: not started')
         self.sobelLabel = QtGui.QLabel('Sobel Filter: not started')
         self.nmsLabel = QtGui.QLabel('Non Maximum Suppression: not started')
@@ -258,6 +257,11 @@ class CannyWindow(QtGui.QWidget):
         self.hysteresisSave = QtGui.QPushButton('Save')
         self.widgets[1].append(self.hysteresisSave)
 
+        self.gblurSigma = QtGui.QComboBox()
+        self.gblurSigma.addItems(['0.5','0.6','0.7','0.8','0.9','1.0','1.1','1.2','1.3','1.4','1.5','2.0','2.5','3.0'])
+        self.gblurRadius = QtGui.QComboBox()
+        self.gblurRadius.addItems(['3','5','7','9','11'])
+
         QtCore.QObject.connect(self.backButton, QtCore.SIGNAL('clicked()'), self.parent().fullCannyHideFunction)
         QtCore.QObject.connect(self.openFileButton, QtCore.SIGNAL('clicked()'), self.openFileFunction)
         QtCore.QObject.connect(self.startButton, QtCore.SIGNAL('clicked()'), self.startFunctionCheck)
@@ -280,34 +284,36 @@ class CannyWindow(QtGui.QWidget):
 
         #Add widgets
         gridLayout.addWidget(self.fileStatusLabel,0,0,QtCore.Qt.AlignLeft)
-        gridLayout.addWidget(self.showButton,0,2,QtCore.Qt.AlignCenter)
-        gridLayout.addWidget(self.openFileButton,0,3,QtCore.Qt.AlignCenter)
+        gridLayout.addWidget(self.showButton,0,3,QtCore.Qt.AlignCenter)
+        gridLayout.addWidget(self.openFileButton,0,4,QtCore.Qt.AlignCenter)
 
         gridLayout.addWidget(self.timerLabel,1,0)
 
-        gridLayout.addWidget(self.threadLabel,2,0)
-        gridLayout.addWidget(self.startButton,2,2,QtCore.Qt.AlignCenter)
-        gridLayout.addWidget(self.cancelButton,2,3,QtCore.Qt.AlignCenter)
+        gridLayout.addWidget(QtGui.QLabel('Sigma'),3,1,QtCore.Qt.AlignBottom)
+        gridLayout.addWidget(QtGui.QLabel('Radius'),3,2,QtCore.Qt.AlignBottom)
+        gridLayout.addWidget(self.startButton,2,0,QtCore.Qt.AlignCenter)
+        gridLayout.addWidget(self.cancelButton,2,0,QtCore.Qt.AlignCenter)
+        gridLayout.addWidget(self.threadLabel,3,0)
 
-        gridLayout.addWidget(self.gblurLabel,3,0)
-        gridLayout.addWidget(self.sobelLabel,4,0)
-        gridLayout.addWidget(self.nmsLabel,5,0,QtCore.Qt.AlignRight)
+        gridLayout.addWidget(self.gblurLabel,4,0)
+        gridLayout.addWidget(self.gblurSigma,4,1,QtCore.Qt.AlignVCenter)
+        gridLayout.addWidget(self.gblurRadius,4,2,QtCore.Qt.AlignVCenter)
+
+        gridLayout.addWidget(self.sobelLabel,5,0)
+        gridLayout.addWidget(self.nmsLabel,6,0)
         #To prevent label from moving show & save widgets
         self.nmsLabel.setMinimumWidth(270)
-        gridLayout.addWidget(self.thresholdLabel,6,0)
-        gridLayout.addWidget(self.hysteresisLabel,7,0)
-
-        #self.spacer = QtGui.QSpacerItem(80,10)
-        #gridLayout.addItem(self.spacer,5,1)
-
-        gridLayout.addWidget(self.saveAllButton,8,3,QtCore.Qt.AlignCenter)
+        gridLayout.addWidget(self.thresholdLabel,7,0)
+        gridLayout.addWidget(self.hysteresisLabel,8,0)
+        gridLayout.addWidget(self.saveAllButton,9,4,QtCore.Qt.AlignCenter)
 
         gridLayout.addWidget(self.backButton,10,0,QtCore.Qt.AlignBottom)
-        gridLayout.addWidget(self.quitButton,10,3,QtCore.Qt.AlignBottom)
+        gridLayout.addWidget(self.quitButton,10,4,QtCore.Qt.AlignBottom)
+
 
         for i in range(0,2):
             for j in range(0,5):
-                gridLayout.addWidget(self.widgets[i][j],j+3,i+2,QtCore.Qt.AlignCenter)
+                gridLayout.addWidget(self.widgets[i][j],j+3,i+3,QtCore.Qt.AlignCenter)
 
         #Hide show and save buttons
         for i in range(0,2):
@@ -320,9 +326,8 @@ class CannyWindow(QtGui.QWidget):
         self.setLayout(gridLayout)
 
     def saveAllFunc(self):
-        pass
-    #Need a dialog to choose a location, not a filename
-        #Oooh! Have a little dialog where the user can choose the name for each file being saved or deselect ones that shouldn't be saved
+        saveDialog = SaveAllDialog(self)
+        saveDialog.exec_()
 
     def dotDotDot(self):
         strList = ['.','..','...']
@@ -532,18 +537,160 @@ class SaveAllDialog(QtGui.QDialog):
     def __init__(self, parent):
         super(SaveAllDialog, self).__init__(parent)
 
+        self.fileExt = '.bmp'
+        self.filenames={'gblur':'gblur', 'smag':'sobel_mag', 'sdir':'sobel_dir', 'shoriz':'sobel_horiz', 'svert':'sobel_vert', 'nms':'nms', 'thresh':'threshold', 'hyst':'hysteresis'}
+        self.filepath = None
+
         self.createWidgets()
 
         self.layout()
+
     def createWidgets(self):
-        self.gblurOption = QtGui.QRadioButton('Gaussian Blur')
-        self.sobelOption = QtGui.QRadioButton('Sobel Filter')
-        self.nmsOption = QtGui.QRadioButton('Non Maximum Suppression')
-        self.thresholdOption = QtGui.QRadioButton('Thresholding')
-        self.hysteresisOption = QtGui.QRadioButton('Hysteresis')
-        #Also need line edits with a default filename to save with
-        #As well as a file dialog to choose LOCATION not filename
-        #Maybe ^ can be merged together to just have a file dialog with a default filename
+        self.openDirButton = QtGui.QPushButton('Select Directory')
+        self.gblurOption = QtGui.QCheckBox('Gaussian Blur')
+        self.gblurName = QtGui.QLineEdit('gblur')
+        self.sobelMagOption = QtGui.QCheckBox('Sobel Gradient Magnitude')
+        self.sobelMagName = QtGui.QLineEdit('sobel_mag')
+        self.sobelDirOption = QtGui.QCheckBox('Sobel Gradient Direction')
+        self.sobelDirName = QtGui.QLineEdit('sobel_dir')
+        self.sobelHorizOption = QtGui.QCheckBox('Sobel Horizontal Gradient')
+        self.sobelHorizName = QtGui.QLineEdit('sobel_horiz')
+        self.sobelVertOption = QtGui.QCheckBox('Sobel Vertical Gradient')
+        self.sobelVertName = QtGui.QLineEdit('sobel_vert')
+        self.nmsOption = QtGui.QCheckBox('Non Maximum Suppression')
+        self.nmsName = QtGui.QLineEdit('nms')
+        self.thresholdOption = QtGui.QCheckBox('Threshold')
+        self.thresholdName = QtGui.QLineEdit('threshold')
+        self.hysteresisOption = QtGui.QCheckBox('Hysteresis')
+        self.hysteresisName = QtGui.QLineEdit('hysteresis')
+
+        self.gblurOption.setChecked(True)
+        self.sobelMagOption.setChecked(True)
+        self.sobelDirOption.setChecked(True)
+        self.sobelHorizOption.setChecked(True)
+        self.sobelVertOption.setChecked(True)
+        self.nmsOption.setChecked(True)
+        self.thresholdOption.setChecked(True)
+        self.hysteresisOption.setChecked(True)
+
+        self.dropDown = QtGui.QComboBox(self)
+        self.dropDown.addItem('.bmp')
+        self.dropDown.addItem('.jpg')
+        self.dropDown.addItem('.png')
+        self.dropDown.addItem('.gif')
+        self.dropDown.setCurrentIndex(0)
+
+        self.saveButton = QtGui.QPushButton('Save')
+        self.saveButton.setMaximumWidth(80)
+        self.closeButton = QtGui.QPushButton('Close')
+        self.closeButton.setMaximumWidth(80)
+
+        QtCore.QObject.connect(self.closeButton, QtCore.SIGNAL('clicked()'), self.exit)
+        self.dropDown.activated[str].connect(self.setFileExt)
+        QtCore.QObject.connect(self.openDirButton, QtCore.SIGNAL('clicked()'), self.openFileFunc)
+        self.gblurName.textChanged.connect(self.updateGblur)
+        self.sobelMagName.textChanged.connect(self.updateSmag)
+        self.sobelDirName.textChanged.connect(self.updateSdir)
+        self.sobelHorizName.textChanged.connect(self.updateShoriz)
+        self.sobelVertName.textChanged.connect(self.updateSvert)
+        self.nmsName.textChanged.connect(self.updateNms)
+        self.thresholdName.textChanged.connect(self.updateThreshold)
+        self.hysteresisName.textChanged.connect(self.updateHysteresis)
+
+    def layout(self):
+        formLayout = QtGui.QFormLayout()
+
+        openDirLayout = QtGui.QGridLayout()
+        openDirLayout.addWidget(self.openDirButton,0,0,QtCore.Qt.AlignCenter)
+        formLayout.addRow(openDirLayout)
+
+        filenameLabel = QtGui.QGridLayout()
+        filenameLabel.addWidget(QtGui.QLabel('Filename'))
+        formLayout.addRow('Select images to save', filenameLabel)
+
+        formLayout.addRow(self.gblurOption, self.gblurName)
+        formLayout.addRow(self.sobelMagOption, self.sobelMagName)
+        formLayout.addRow(self.sobelDirOption, self.sobelDirName)
+        formLayout.addRow(self.sobelHorizOption, self.sobelHorizName)
+        formLayout.addRow(self.sobelVertOption, self.sobelVertName)
+        formLayout.addRow(self.nmsOption, self.nmsName)
+        formLayout.addRow(self.thresholdOption, self.thresholdName)
+        formLayout.addRow(self.hysteresisOption, self.hysteresisName)
+        formLayout.addRow('File Extension', self.dropDown)
+
+        buttonsLayout = QtGui.QGridLayout()
+        buttonsLayout.addWidget(self.saveButton,0,0,QtCore.Qt.AlignCenter)
+        buttonsLayout.addWidget(self.closeButton,1,0,QtCore.Qt.AlignCenter)
+        formLayout.addRow(buttonsLayout)
+
+        self.setLayout(formLayout)
+
+    def openFileFunc(self):
+        fileDialog = QtGui.QFileDialog(self)
+        fileDialog.setFileMode(QtGui.QFileDialog.Directory)
+        fileDialog.setOption(QtGui.QFileDialog.ShowDirsOnly, True)
+
+        if fileDialog.exec_():
+            self.filepath = fileDialog.selectedFiles()[0]
+
+    def saveFiles(self):
+        if self.filepath is None:
+            self.parent().errorMessage('No Directory Selected')
+        else:
+            if self.gblurOption.isChecked():
+                data = self.parent().parent().parent().I.gblur
+                im.fromarray(data).convert('RGB').save(self.filepath+'/'+self.filenames['gblur']+self.fileExt)
+            if self.sobelMagOption.isChecked():
+                data = self.parent().parent().parent().I.smagnitude
+                im.fromarray(data).convert('RGB').save(self.filepath+'/'+self.filenames['smag']+self.fileExt)
+            if self.sobelDirOption.isChecked():
+                data = self.parent().parent().parent().I.sdirection
+                im.fromarray(data).convert('RGB').save(self.filepath+'/'+self.filenames['sdir']+self.fileExt)
+            if self.sobelHorizOption.isChecked():
+                data = self.parent().parent().parent().I.shgradient
+                im.fromarray(data).convert('RGB').save(self.filepath+'/'+self.filenames['shoriz']+self.fileExt)
+            if self.sobelVertOption.isChecked():
+                data = self.parent().parent().parent().I.svgradient
+                im.fromarray(data).convert('RGB').save(self.filepath+'/'+self.filenames['svert']+self.fileExt)
+            if self.nmsOption.isChecked():
+                data = self.parent().parent().parent().I.suppressed
+                im.fromarray(data).convert('RGB').save(self.filepath+'/'+self.filenames['nms']+self.fileExt)
+            if self.thresholdOption.isChecked():
+                data = self.parent().parent().parent().I.thresholded
+                im.fromarray(data).convert('RGB').save(self.filepath+'/'+self.filenames['thresh']+self.fileExt)
+            if self.hysteresisOption.isChecked():
+                data = self.parent().parent().parent().I.final
+                im.fromarray(data).convert('RGB').save(self.filepath+'/'+self.filenames['hyst']+self.fileExt)
+
+    def exit(self):
+        self.close()
+
+    def updateGblur(self, text):
+        self.filenames['gblur'] = text
+
+    def updateSmag(self, text):
+        self.filenames['smag'] = text
+
+    def updateSdir(self, text):
+        self.filenames['sdir'] = text
+
+    def updateShoriz(self, text):
+        self.filenames['shoriz'] = text
+
+    def updateSvert(self, text):
+        self.filenames['svert'] = text
+
+    def updateNms(self, text):
+        self.filenames['nms'] = text
+
+    def updateThreshold(self, text):
+        self.filenames['thresh'] = text
+
+    def updateHysteresis(self, text):
+        self.filenames['hyst'] = text
+
+    def setFileExt(self, text):
+        self.fileExt = text
 
 class SobelOptionsDialog(QtGui.QDialog):
     def __init__(self, parent, dialogType):
