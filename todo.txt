@@ -16,6 +16,7 @@ TODO:
 	-in HCI: gestalt principles of organisation
 	-in analysis research section: point out that thresholding hysteresis often split into two stages
 	-point out that progress bar is inferior to a timer - it is not known how much processing is needed so a progress bar is not suitable, timer lets you know it's still going
+	-point out that whilst i could have created a class that is inherited by canny window and options window, the functions used in each, whilst similar, are slightly different so it would not have been practical nor would it have saved any time/effort
 
 -Data storage
 
@@ -30,19 +31,11 @@ TODO:
 	-Why are there still some interpolation errors
 
 -GUI:
-	-Refine open file button/method, make it only allow image files
-	-Connect up combo box for sigma & radius
-	-Set default keys e.g. esc to exit a dialog
-		-Ctrl+Q to exit gui
-		-Ctrl+O to open file
-		-Ctrl+S to start
+	-change all connections to be the new style(?)
+	-make a class that is inherited by canny window and options window that has the functions needed
 	-(in individual options) Add a 'load from current process' for options after gblur, 
 	so that you can go straight from gblur to sobel (for example) 
 	without having to save and then load
-	-Add a dropdown menu to select sigma and radius
-	Bugs:
-		-Cancelling, loading a new image, and then running causes errors: clock counts in twos, starts to terminate again
-		-Yeah it's seriously broken if you cancel and then restart...
 
 -Fix thresholding:
 	-Can I threshold the image differently to get better thresholds
