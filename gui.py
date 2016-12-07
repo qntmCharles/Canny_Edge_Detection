@@ -24,265 +24,13 @@ class MainWindow(QtGui.QMainWindow):
         #Set title
         self.setWindowTitle('Canny Edge Detection')
 
-        self.setFixedSize(600,600)
+        self.setFixedSize(750,600)
+
+        QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Q"), self, self.close)
 
         #Initialise central widget
-        QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Q"), self, self.close)
-        self.I=None
-        self.central_widget = QtGui.QStackedWidget()
-        self.setCentralWidget(self.central_widget)
-        self.startWidget = StartWindow(self)
-        self.fileStatusString = 'File: not loaded'
-        self.optionsWidget = OptionsWindow(self)
         self.cannyWidget = CannyWindow(self)
-        self.central_widget.addWidget(self.cannyWidget)
-        self.central_widget.addWidget(self.optionsWidget)
-        self.central_widget.addWidget(self.startWidget)
-        self.central_widget.setCurrentWidget(self.startWidget)
-
-    def fullCannyShowFunction(self):
-        self.central_widget.setCurrentWidget(self.cannyWidget)
-
-    def fullCannyHideFunction(self):
-        self.central_widget.setCurrentWidget(self.startWidget)
-
-    def otherOptionsShowFunction(self):
-        self.central_widget.setCurrentWidget(self.optionsWidget)
-
-    def otherOptionsHideFunction(self):
-        self.central_widget.setCurrentWidget(self.startWidget)
-
-class StartWindow(QtGui.QWidget):
-    """Initial window."""
-    def __init__(self,parent):
-        super(StartWindow,self).__init__(parent)
-
-        self.setFixedSize(600,600)
-
-        #Create widgets
-        self.createWidgets()
-
-        #Set layout
-        self.layout()
-
-    def createWidgets(self):
-        #Define widgets
-        self.quitButton = QtGui.QPushButton('Quit')
-        self.fullCannyButton = QtGui.QPushButton('Full Canny Edge Detection')
-        self.otherOptionsButton = QtGui.QPushButton('Select Individual Options')
-        self.titleLabel = QtGui.QLabel('Canny Edge Detection')
-
-        #Connect widgets
-        QtCore.QObject.connect(self.fullCannyButton, QtCore.SIGNAL('clicked()'), self.parent().fullCannyShowFunction)
-        QtCore.QObject.connect(self.otherOptionsButton, QtCore.SIGNAL('clicked()'), self.parent().otherOptionsShowFunction)
-
-    def layout(self):
-        #Create layout
-        gridLayout = QtGui.QGridLayout()
-
-        #Add widgets
-        gridLayout.addWidget(self.quitButton,6,1,QtCore.Qt.AlignCenter)
-        gridLayout.addWidget(self.fullCannyButton,3,1,QtCore.Qt.AlignCenter)
-        gridLayout.addWidget(self.otherOptionsButton,4,1,QtCore.Qt.AlignCenter)
-        gridLayout.addWidget(self.titleLabel,0,1,QtCore.Qt.AlignCenter)
-
-        #Set layout to window
-        self.setLayout(gridLayout)
-
-class OptionsWindow(QtGui.QWidget):
-    def __init__(self,parent):
-        super(OptionsWindow, self).__init__(parent)
-        #Create widgets
-        self.createWidgets()
-
-        #Set layout
-        self.layout()
-
-        self.setFixedSize(600,600)
-
-
-    def createWidgets(self):
-        self.widgets=[[],[]]
-
-        #Define widgets
-        self.backButton = QtGui.QPushButton('Back')
-        self.backButton.setMaximumWidth(100)
-        self.fileStatusLabel = QtGui.QLabel('')
-        self.fileStatusLabel.setText(self.parent().fileStatusString)
-        self.quitButton = QtGui.QPushButton('Quit')
-        self.quitButton.setMaximumWidth(100)
-        self.openFileButton = QtGui.QPushButton('Open file')
-        self.showFileButton = QtGui.QPushButton('Show file')
-        self.timerLabel = QtGui.QLabel('00:00')
-        self.resetButton = QtGui.QPushButton('Reset')
-        self.resetButton.hide()
-        self.startButton = QtGui.QPushButton('Start')
-        self.cancelButton = QtGui.QPushButton('Cancel')
-        self.cancelButton.hide()
-        self.threadLabel = QtGui.QLabel('')
-        self.saveAllButton = QtGui.QPushButton('Save all')
-
-        self.gblurTickbox = QtGui.QCheckBox('')
-        self.gblurTickbox.setChecked(True)
-        self.gblurLabel = QtGui.QLabel('Gaussian Blur: not started')
-        self.sobelTickbox = QtGui.QCheckBox('')
-        self.sobelTickbox.setChecked(True)
-        self.sobelLabel = QtGui.QLabel('Sobel Filter: not started')
-        self.nmsTickbox = QtGui.QCheckBox('')
-        self.nmsTickbox.setChecked(True)
-        self.nmsLabel = QtGui.QLabel('Non Maximum Suppression: not started')
-        self.thresholdTickbox = QtGui.QCheckBox('')
-        self.thresholdTickbox.setChecked(True)
-        self.thresholdLabel = QtGui.QLabel('Thresholding: not started')
-        self.hysteresisTickbox = QtGui.QCheckBox('')
-        self.hysteresisTickbox.setChecked(True)
-        self.hysteresisLabel = QtGui.QLabel('Hysteresis: not started')
-
-        self.gblurShow = QtGui.QPushButton('Show')
-        self.widgets[0].append(self.gblurShow)
-        self.sobelShow = QtGui.QPushButton('Show')
-        self.widgets[0].append(self.sobelShow)
-        self.nmsShow = QtGui.QPushButton('Show')
-        self.widgets[0].append(self.nmsShow)
-        self.thresholdShow = QtGui.QPushButton('Show')
-        self.widgets[0].append(self.thresholdShow)
-        self.hysteresisShow = QtGui.QPushButton('Show')
-        self.widgets[0].append(self.hysteresisShow)
-
-        self.gblurSave = QtGui.QPushButton('Save')
-        self.widgets[1].append(self.gblurSave)
-        self.sobelSave = QtGui.QPushButton('Save')
-        self.widgets[1].append(self.sobelSave)
-        self.nmsSave = QtGui.QPushButton('Save')
-        self.widgets[1].append(self.nmsSave)
-        self.thresholdSave = QtGui.QPushButton('Save')
-        self.widgets[1].append(self.thresholdSave)
-        self.hysteresisSave = QtGui.QPushButton('Save')
-        self.widgets[1].append(self.hysteresisSave)
-
-        self.gblurSigma = QtGui.QComboBox()
-        self.gblurSigma.addItems(['0.5','0.6','0.7','0.8','0.9','1.0','1.1','1.2','1.3','1.4','1.5','2.0','2.5','3.0'])
-        self.gblurSigma.setCurrentIndex(5)
-
-        self.gblurRadius = QtGui.QComboBox()
-        self.gblurRadius.addItems(['3','5','7','9','11'])
-        self.gblurRadius.setCurrentIndex(1)
-
-        QtCore.QObject.connect(self.openFileButton, QtCore.SIGNAL('clicked()'), self.openFileFunc)
-        QtCore.QObject.connect(self.backButton, QtCore.SIGNAL('clicked()'), self.parent().otherOptionsHideFunction)
-        QtCore.QObject.connect(self.showFileButton, QtCore.SIGNAL('clicked()'), self.showOriginalFunc)
-        QtCore.QObject.connect(self.saveAllButton, QtCore.SIGNAL('clicked()'), self.saveAllFunc)
-        #QtCore.Qobject.connect(self.startButton, QtCore.SIGNAL('clicked()'), self.startFunctionCheck)
-        self.gblurSave.clicked.connect(lambda: self.saveFunc(self.parent().parent().I.gblur))
-
-    def layout(self):
-        #Create layout
-        gridLayout = QtGui.QGridLayout()
-
-        #Add widgets
-        gridLayout.addWidget(self.fileStatusLabel,0,0,QtCore.Qt.AlignLeft)
-        gridLayout.addWidget(self.showFileButton,0,3,QtCore.Qt.AlignCenter)
-        gridLayout.addWidget(self.openFileButton,0,4,QtCore.Qt.AlignCenter)
-
-        gridLayout.addWidget(self.timerLabel,1,0)
-        gridLayout.addWidget(self.resetButton,1,4)
-
-        self.startCancelLayout = QtGui.QHBoxLayout()
-        self.startCancelLayout.addWidget(self.startButton)
-        self.startCancelLayout.addWidget(self.cancelButton)
-        gridLayout.addLayout(self.startCancelLayout,2,0,2,-1,QtCore.Qt.AlignCenter)
-
-        gridLayout.addWidget(self.threadLabel,3,0)
-        gridLayout.addWidget(QtGui.QLabel('Sigma'),3,1,QtCore.Qt.AlignBottom)
-        gridLayout.addWidget(QtGui.QLabel('Radius'),3,2,QtCore.Qt.AlignBottom)
-
-        self.gblurLayout = QtGui.QFormLayout()
-        self.gblurLayout.addRow(self.gblurTickbox, self.gblurLabel)
-        self.gblurLayout.setFormAlignment(QtCore.Qt.AlignCenter)
-        gridLayout.addLayout(self.gblurLayout,4,0)
-        gridLayout.addWidget(self.gblurSigma,4,1,QtCore.Qt.AlignVCenter)
-        gridLayout.addWidget(self.gblurRadius,4,2,QtCore.Qt.AlignVCenter)
-
-        self.sobelLayout = QtGui.QFormLayout()
-        self.sobelLayout.addRow(self.sobelTickbox, self.sobelLabel)
-        self.sobelLayout.setFormAlignment(QtCore.Qt.AlignCenter)
-        gridLayout.addLayout(self.sobelLayout,5,0)
-
-        self.nmsLayout = QtGui.QFormLayout()
-        self.nmsLayout.addRow(self.nmsTickbox, self.nmsLabel)
-        self.nmsLayout.setFormAlignment(QtCore.Qt.AlignCenter)
-        gridLayout.addLayout(self.nmsLayout,6,0)
-
-        self.nmsLabel.setMinimumWidth(270)
-
-        self.thresholdLayout = QtGui.QFormLayout()
-        self.thresholdLayout.addRow(self.thresholdTickbox, self.thresholdLabel)
-        self.thresholdLayout.setFormAlignment(QtCore.Qt.AlignCenter)
-        gridLayout.addLayout(self.thresholdLayout,7,0)
-
-        self.hystLayout = QtGui.QFormLayout()
-        self.hystLayout.addRow(self.hysteresisTickbox, self.hysteresisLabel)
-        self.hystLayout.setFormAlignment(QtCore.Qt.AlignCenter)
-        gridLayout.addLayout(self.hystLayout,8,0)
-
-        gridLayout.addWidget(self.saveAllButton,9,4,QtCore.Qt.AlignCenter)
-
-        gridLayout.addWidget(self.backButton,10,0,QtCore.Qt.AlignBottom)
-        gridLayout.addWidget(self.quitButton,10,4,QtCore.Qt.AlignBottom)
-
-        for i in range(0,2):
-            for j in range(0,5):
-                gridLayout.addWidget(self.widgets[i][j],j+4,i+3,QtCore.Qt.AlignCenter)
-
-        #Hide show and save buttons
-        for i in range(0,2):
-            for j in range(0,5):
-                self.widgets[i][j].hide()
-
-        self.saveAllButton.hide()
-        self.showFileButton.hide()
-
-        #Set layout
-        self.setLayout(gridLayout)
-
-    def openFileFunc(self):
-        #Open file dialog and get selected filepath
-        filepath = QtGui.QFileDialog.getOpenFileName(self, 'Open file', '~', 'Image files (*.jpg *.gif *.bmp *.png)')
-        if filepath:
-            #Store loaded image in Image object
-            self.parent().parent().I = Image(np.asarray(im.open(filepath).convert('L'),dtype=np.float))
-            #Set file status
-            self.parent().parent().fileStatusString = 'File: '+str(filepath.split('/')[-1])
-            self.fileStatusLabel.setText(self.parent().parent().fileStatusString)
-            self.parent().parent().optionsWidget.fileStatusLabel.setText(self.parent().parent().fileStatusString)
-            self.showFileButton.show()
-
-    def saveAllFunc(self):
-        saveDialog = SaveAllDialog(self)
-        saveDialog.exec_()
-
-    def showOriginalFunc(self):
-        if self.parent().parent().I is None:
-            self.errorMessage('No Image Loaded')
-        else:
-            self.showFunc(self.parent().parent().I.original,'gray')
-
-    def showFunc(self, image, colourmap):
-        try:
-            self.showImage = mplWindow(image, colourmap)
-            self.showImage.exec_()
-        except Exception as e:
-            print(e)
-            self.errorMessage('Exception Occured')
-
-    def saveFunc(self, image):
-        filepath = QtGui.QFileDialog.getSaveFileName(self, 'Save file', '~', 'Image files (*.jpg *.gif *.bmp *.png)')
-        if filepath:
-            try:
-                im.fromarray(image.astype(np.uint8)).save(filepath)
-            except Exception as e:
-                print(e)
-                self.errorMessage('Exception Occured')
+        self.setCentralWidget(self.cannyWidget)
 
 class CannyWindow(QtGui.QWidget):
     def __init__(self, parent):
@@ -293,43 +41,61 @@ class CannyWindow(QtGui.QWidget):
         #Set layout
         self.layout()
 
+        QtGui.QShortcut(QtGui.QKeySequence("Ctrl+C"), self, self.terminateThread)
         QtGui.QShortcut(QtGui.QKeySequence("Ctrl+O"), self, self.openFileFunc)
         QtGui.QShortcut(QtGui.QKeySequence("Ctrl+S"), self, self.startFunctionCheck)
-        QtGui.QShortcut(QtGui.QKeySequence("Ctrl+C"), self, self.terminateThread)
-        QtGui.QShortcut(QtGui.QKeySequence("Backspace"), self, self.parent().fullCannyHideFunction)
-        self.setFixedSize(600,600)
-        self.worker=None
+
+        self.setFixedSize(750,600)
+        self.worker = None
+        self.I = None
         self.sigma = 1.0
         self.radius = 5
-        self.minutes=0
-        self.seconds=0
+        self.minutes = 0
+        self.seconds = 0
 
     def createWidgets(self):
         self.widgets = [[],[]]
         #Define widgets
-        self.backButton = QtGui.QPushButton('Back')
-        self.backButton.setMaximumWidth(100)
+        fileStatusFont = QtGui.QFont()
+        fileStatusFont.setPointSize(15)
         self.fileStatusLabel = QtGui.QLabel('')
-        self.fileStatusLabel.setText(self.parent().fileStatusString)
+        self.fileStatusLabel.setText('File: not loaded')
+        self.fileStatusLabel.setFont(fileStatusFont)
+
         self.openFileButton = QtGui.QPushButton('Open file')
         self.quitButton = QtGui.QPushButton('Quit')
-        self.quitButton.setMaximumWidth(100)
         self.startButton = QtGui.QPushButton('Start')
         self.cancelButton = QtGui.QPushButton('Cancel')
         self.cancelButton.hide()
         self.threadLabel = QtGui.QLabel('')
         self.guiTimer = QtCore.QTimer()
+
         self.timerLabel = QtGui.QLabel('00:00')
+        timerLabelFont = QtGui.QFont()
+        timerLabelFont.setPointSize(18)
+        self.timerLabel.setFont(timerLabelFont)
+        self.timerLabel.setMaximumWidth(88)
+        self.timerLabel.setStyleSheet("border: 2px solid")
+
         self.showFileButton = QtGui.QPushButton('Show file')
         self.saveAllButton = QtGui.QPushButton('Save all')
+
         self.resetButton = QtGui.QPushButton('Reset')
+        self.resetButton.setMaximumWidth(80)
         self.resetButton.hide()
 
+        labelFont = QtGui.QFont()
+        labelFont.setPointSize(11)
         self.gblurLabel = QtGui.QLabel('Gaussian Blur: not started')
+        self.gblurLabel.setFont(labelFont)
         self.sobelLabel = QtGui.QLabel('Sobel Filter: not started')
+        self.sobelLabel.setFont(labelFont)
         self.nmsLabel = QtGui.QLabel('Non Maximum Suppression: not started')
+        self.nmsLabel.setFont(labelFont)
         self.thresholdLabel = QtGui.QLabel('Thresholding: not started')
+        self.thresholdLabel.setFont(labelFont)
         self.hysteresisLabel = QtGui.QLabel('Hysteresis: not started')
+        self.hysteresisLabel.setFont(labelFont)
 
         self.gblurLabel.activated = False
         self.sobelLabel.activated = False
@@ -367,23 +133,21 @@ class CannyWindow(QtGui.QWidget):
         self.gblurRadius.addItems(['3','5','7','9','11'])
         self.gblurRadius.setCurrentIndex(1)
 
-        QtCore.QObject.connect(self.backButton, QtCore.SIGNAL('clicked()'), self.parent().fullCannyHideFunction)
-        QtCore.QObject.connect(self.openFileButton, QtCore.SIGNAL('clicked()'), self.openFileFunc)
-        QtCore.QObject.connect(self.startButton, QtCore.SIGNAL('clicked()'), self.startFunctionCheck)
-        QtCore.QObject.connect(self.showFileButton, QtCore.SIGNAL('clicked()'), self.showOriginalFunc)
-        QtCore.QObject.connect(self.gblurSave, QtCore.SIGNAL('clicked()'), lambda: self.saveFunc(self.parent().parent().I.gblur))
-        QtCore.QObject.connect(self.gblurShow, QtCore.SIGNAL('clicked()'), lambda: self.showFunc(self.parent().parent().I.gblur, 'gray'))
-        QtCore.QObject.connect(self.sobelSave, QtCore.SIGNAL('clicked()'), lambda: self.sobelOptionsFunc(self, 'Save'))
-        QtCore.QObject.connect(self.sobelShow, QtCore.SIGNAL('clicked()'), lambda: self.sobelOptionsFunc(self, 'Show'))
-        QtCore.QObject.connect(self.nmsSave, QtCore.SIGNAL('clicked()'), lambda: self.saveFunc(self.parent().parent().I.suppressed))
-        QtCore.QObject.connect(self.nmsShow, QtCore.SIGNAL('clicked()'), lambda: self.showFunc(self.parent().parent().I.suppressed, 'gray'))
-        QtCore.QObject.connect(self.thresholdSave, QtCore.SIGNAL('clicked()'), lambda: self.saveFunc(self.parent().parent().I.thresholded))
-        QtCore.QObject.connect(self.thresholdShow, QtCore.SIGNAL('clicked()'), lambda: self.showFunc(self.parent().parent().I.thresholded, 'gray'))
-        QtCore.QObject.connect(self.hysteresisSave, QtCore.SIGNAL('clicked()'), lambda: self.saveFunc(self.parent().parent().I.final))
-        QtCore.QObject.connect(self.hysteresisShow, QtCore.SIGNAL('clicked()'), lambda: self.showFunc(self.parent().parent().I.final, 'gray'))
-        QtCore.QObject.connect(self.saveAllButton, QtCore.SIGNAL('clicked()'), self.saveAllFunc)
-        QtCore.QObject.connect(self.cancelButton, QtCore.SIGNAL('clicked()'), self.terminateThread)
-        QtCore.QObject.connect(self.resetButton, QtCore.SIGNAL('clicked()'), self.reset)
+        self.openFileButton.clicked.connect(self.openFileFunc)
+        self.startButton.clicked.connect(self.startFunctionCheck)
+        self.showFileButton.clicked.connect(lambda: self.showFunc(self.I.original, 'gray'))
+        self.gblurSave.clicked.connect(lambda: self.saveFunc(self.I.gblur))
+        self.gblurShow.clicked.connect(lambda: self.showFunc(self.I.gblur, 'gray'))
+        self.sobelSave.clicked.connect(lambda: self.sobelOptionsFunc('Save'))
+        self.sobelShow.clicked.connect(lambda: self.sobelOptionsFunc('Show'))
+        self.nmsSave.clicked.connect(lambda: self.saveFunc(self.I.suppressed))
+        self.nmsShow.clicked.connect(lambda: self.showFunc(self.I.suppressed, 'gray'))
+        self.thresholdSave.clicked.connect(lambda: self.saveFunc(self.I.thresholded))
+        self.thresholdShow.clicked.connect(lambda: self.showFunc(self.I.thresholded, 'gray'))
+        self.hysteresisShow.clicked.connect(lambda: self.showFunc(self.I.final, 'gray'))
+        self.saveAllButton.clicked.connect(self.saveAllFunc)
+        self.cancelButton.clicked.connect(self.terminateThread)
+        self.resetButton.clicked.connect(self.resetFunc)
 
     def layout(self):
         #Create layout
@@ -395,8 +159,11 @@ class CannyWindow(QtGui.QWidget):
         gridLayout.addWidget(self.openFileButton,0,4,QtCore.Qt.AlignCenter)
 
         gridLayout.addWidget(self.timerLabel,1,0)
-        gridLayout.addWidget(self.resetButton,1,4)
 
+        hline = QtGui.QFrame()
+        hline.setFrameShape(QtGui.QFrame.HLine)
+        hline.setFrameShadow(QtGui.QFrame.Plain)
+        gridLayout.addWidget(hline,2,0,2,-1,QtCore.Qt.AlignTop)
         self.startCancelLayout = QtGui.QHBoxLayout()
         self.startCancelLayout.addWidget(self.startButton)
         self.startCancelLayout.addWidget(self.cancelButton)
@@ -414,14 +181,14 @@ class CannyWindow(QtGui.QWidget):
         gridLayout.addWidget(self.nmsLabel,6,0)
 
         #To prevent label from moving show & save widgets
-        self.nmsLabel.setMinimumWidth(270)
+        self.nmsLabel.setMinimumWidth(350)
 
         gridLayout.addWidget(self.thresholdLabel,7,0)
         gridLayout.addWidget(self.hysteresisLabel,8,0)
 
         gridLayout.addWidget(self.saveAllButton,9,4,QtCore.Qt.AlignCenter)
 
-        gridLayout.addWidget(self.backButton,10,0,QtCore.Qt.AlignBottom)
+        gridLayout.addWidget(self.resetButton,10,0,QtCore.Qt.AlignBottom)
         gridLayout.addWidget(self.quitButton,10,4,QtCore.Qt.AlignBottom)
 
         for i in range(0,2):
@@ -439,11 +206,7 @@ class CannyWindow(QtGui.QWidget):
         #Set layout
         self.setLayout(gridLayout)
 
-    def saveAllFunc(self):
-        saveDialog = SaveAllDialog(self)
-        saveDialog.exec_()
-
-    def reset(self):
+    def resetFunc(self):
         if self.worker.isRunning(): #Does this even work?
             self.terminateThread()
         else:
@@ -453,29 +216,59 @@ class CannyWindow(QtGui.QWidget):
             for j in range(0,5):
                 self.widgets[i][j].hide()
 
-        print(self.parent().parent().I)
-        self.parent().parent().I.__init__(self.parent().parent().I.original)
-        print(self.parent().parent().I)
+        self.I.__init__(self.I.original)
+        self.resetButton.hide()
+
+    def terminateThread(self):
+        if self.worker:
+            self.cancelButton.setEnabled(False)
+            self.cancelButton.setWindowOpacity(0.5)
+            self.threadLabel.setText('Waiting for thread termination...')
+            self.threadLabel.activated = True
+            self.worker.stopFlag = True
+
+            self.gblurLabel.activated = False
+            self.sobelLabel.activated = False
+            self.nmsLabel.activated = False
+            self.thresholdLabel.activated = False
+            self.hysteresisLabel.activated = False
+
+            self.gblurLabel.setText('Gaussian Blur: not started')
+            self.sobelLabel.setText('Sobel Filter: not started')
+            self.nmsLabel.setText('Non Maximum Suppression: not started')
+            self.thresholdLabel.setText('Thresholding: not started')
+            self.hysteresisLabel.setText('Hysteresis: not started')
+
+            self.guiTimer.stop()
+            self.timerLabel.setText('00:00')
+        else:
+            self.errorMessage('Thread Does Not Exist')
+
+    def finishedThreadFunc(self):
+        self.guiTimer.stop()
+        self.guiTimer.timeout.disconnect(self.updateStrings)
+        self.guiTimer.timeout.disconnect(self.updateTimer)
+
+        self.threadLabel.activated=False
+        self.threadLabel.setText('')
+
+        self.startButton.show()
+        self.cancelButton.hide()
+        self.resetButton.show()
+        self.cancelButton.setEnabled(True)
+        self.cancelButton.setWindowOpacity(1)
+
+    def saveAllFunc(self):
+        saveDialog = SaveAllDialog(self)
+        saveDialog.exec_()
 
     def dotDotDot(self):
         strList = ['.','..','...']
         return strList[self.seconds % 3]
 
-    def updateStrings(self):
-        if self.gblurLabel.activated:
-            self.gblurLabel.setText('Gaussian Blur: processing'+self.dotDotDot())
-        if self.sobelLabel.activated:
-            self.sobelLabel.setText('Sobel Filter: processing'+self.dotDotDot())
-        if self.nmsLabel.activated:
-            self.nmsLabel.setText('Non Maximum Suppression: processing'+self.dotDotDot())
-        if self.thresholdLabel.activated:
-            self.thresholdLabel.setText('Thresholding: processing'+self.dotDotDot())
-        if self.hysteresisLabel.activated:
-            self.hysteresisLabel.setText('Hysteresis: processing'+self.dotDotDot())
-        if self.threadLabel.activated:
-            self.threadLabel.setText('Waiting for thread termination'+self.dotDotDot())
-
+    #Change this to a lambda in connect
     def showOriginalFunc(self):
+        #Ask liam about this - technically it's exception handling but I /know/ it won't be needed - do I keep it?
         if self.parent().parent().I is None:
             self.errorMessage('No Image Loaded')
         else:
@@ -522,14 +315,54 @@ class CannyWindow(QtGui.QWidget):
         errorMsg.setEscapeButton(QtGui.QMessageBox.Ok)
         errorMsg.exec_()
 
+    def updateFromThreadFunc(self, label, labelText):
+        if not self.worker.stopFlag:
+            label.setText(labelText)
+            label.activated = True
+
+    def finishFromThreadFunc(self, label, labelText, saveButton, showButton, flag=False):
+        if not self.worker.stopFlag:
+            label.activated = False
+            label.setText(labelText)
+            saveButton.show()
+            showButton.show()
+            if flag:
+                self.saveAllButton.show()
+
+    def openFileFunc(self):
+        #Open file dialog and get selected filepath
+        filepath = QtGui.QFileDialog.getOpenFileName(self, 'Open file', '~', 'Image files (*.jpg *.gif *.bmp *.png)')
+        if filepath:
+            #Store loaded image in Image object
+            self.I = Image(np.asarray(im.open(filepath).convert('L'),dtype=np.float))
+            #Set file status
+            self.fileStatusLabel.setText('File: '+str(filepath.split('/')[-1]))
+
+            #Show 'show file' button
+            self.showFileButton.show()
+
     def startFunctionCheck(self):
         #Check if no image has been loaded
-        if self.parent().parent().I is None:
+        if self.I is None:
             #Show error message
             self.errorMessage('No Image Loaded')
         else:
             #Continue
             self.startFunction()
+
+    def updateStrings(self):
+        if self.gblurLabel.activated:
+            self.gblurLabel.setText('Gaussian Blur: processing'+self.dotDotDot())
+        if self.sobelLabel.activated:
+            self.sobelLabel.setText('Sobel Filter: processing'+self.dotDotDot())
+        if self.nmsLabel.activated:
+            self.nmsLabel.setText('Non Maximum Suppression: processing'+self.dotDotDot())
+        if self.thresholdLabel.activated:
+            self.thresholdLabel.setText('Thresholding: processing'+self.dotDotDot())
+        if self.hysteresisLabel.activated:
+            self.hysteresisLabel.setText('Hysteresis: processing'+self.dotDotDot())
+        if self.threadLabel.activated:
+            self.threadLabel.setText('Waiting for thread termination'+self.dotDotDot())
 
     def startFunction(self):
         #Timer
@@ -581,91 +414,11 @@ class CannyWindow(QtGui.QWidget):
                 lambda: self.updateFromThreadFunc(self.hysteresisLabel, 'Hysteresis: processing.'))
         QtCore.QObject.connect(self.worker, QtCore.SIGNAL('finishHysteresis'),
                 lambda: self.finishFromThreadFunc(self.hysteresisLabel, 'Hysteresis: complete', self.hysteresisSave, self.hysteresisShow, True))
-        QtCore.QObject.connect(self.worker, QtCore.SIGNAL('finished()'), self.finishedThreadFunc)
+        self.worker.finished.connect(self.finishedThreadFunc)
 
         #Start threads
         self.worker.start()
         self.update.start()
-
-    def updateFromThreadFunc(self, label, labelText):
-        if not self.worker.stopFlag:
-            label.setText(labelText)
-            label.activated = True
-
-    def finishFromThreadFunc(self, label, labelText, saveButton, showButton, flag=False):
-        if not self.worker.stopFlag:
-            label.activated = False
-            label.setText(labelText)
-            saveButton.show()
-            showButton.show()
-            if flag:
-                self.saveAllButton.show()
-
-    def terminateThread(self):
-        if self.worker:
-            self.cancelButton.setEnabled(False)
-            self.cancelButton.setWindowOpacity(0.5)
-            self.threadLabel.setText('Waiting for thread termination...')
-            self.threadLabel.activated = True
-            self.worker.stopFlag = True
-
-            self.gblurLabel.activated = False
-            self.sobelLabel.activated = False
-            self.nmsLabel.activated = False
-            self.thresholdLabel.activated = False
-            self.hysteresisLabel.activated = False
-
-            self.gblurLabel.setText('Gaussian Blur: not started')
-            self.sobelLabel.setText('Sobel Filter: not started')
-            self.nmsLabel.setText('Non Maximum Suppression: not started')
-            self.thresholdLabel.setText('Thresholding: not started')
-            self.hysteresisLabel.setText('Hysteresis: not started')
-
-            self.guiTimer.stop()
-            self.timerLabel.setText('00:00')
-        else:
-            self.errorMessage('Thread Does Not Exist')
-
-    def finishedThreadFunc(self):
-        print('Thread finish function called')
-        self.guiTimer.stop()
-        self.guiTimer.timeout.disconnect(self.updateStrings)
-        self.guiTimer.timeout.disconnect(self.updateTimer)
-
-        self.threadLabel.activated=False
-        self.threadLabel.setText('')
-
-        self.startButton.show()
-        self.cancelButton.hide()
-        self.resetButton.show()
-        self.cancelButton.setEnabled(True)
-        self.cancelButton.setWindowOpacity(1)
-
-    def updateFromThreadFunc(self, label, labelText):
-        if not self.worker.stopFlag:
-            label.setText(labelText)
-            label.activated = True
-
-    def finishFromThreadFunc(self, label, labelText, saveButton, showButton, flag=False):
-        if not self.worker.stopFlag:
-            label.activated = False
-            label.setText(labelText)
-            saveButton.show()
-            showButton.show()
-            if flag:
-                self.saveAllButton.show()
-
-    def openFileFunc(self):
-        #Open file dialog and get selected filepath
-        filepath = QtGui.QFileDialog.getOpenFileName(self, 'Open file', '~', 'Image files (*.jpg *.gif *.bmp *.png)')
-        if filepath:
-            #Store loaded image in Image object
-            self.parent().parent().I = Image(np.asarray(im.open(filepath).convert('L'),dtype=np.float))
-            #Set file status
-            self.parent().parent().fileStatusString = 'File: '+str(filepath.split('/')[-1])
-            self.fileStatusLabel.setText(self.parent().parent().fileStatusString)
-            self.parent().parent().optionsWidget.fileStatusLabel.setText(self.parent().parent().fileStatusString)
-            self.showFileButton.show()
 
 class SaveAllDialog(QtGui.QDialog):
     def __init__(self, parent):
@@ -719,17 +472,18 @@ class SaveAllDialog(QtGui.QDialog):
         self.closeButton = QtGui.QPushButton('Close')
         self.closeButton.setMaximumWidth(80)
 
-        QtCore.QObject.connect(self.closeButton, QtCore.SIGNAL('clicked()'), self.exit)
+        self.closeButton.clicked.connect(self.exit)
         self.dropDown.activated[str].connect(self.setFileExt)
-        QtCore.QObject.connect(self.openDirButton, QtCore.SIGNAL('clicked()'), self.openFileFunc)
-        self.gblurName.textChanged.connect(self.updateGblur)
-        self.sobelMagName.textChanged.connect(self.updateSmag)
-        self.sobelDirName.textChanged.connect(self.updateSdir)
-        self.sobelHorizName.textChanged.connect(self.updateShoriz)
-        self.sobelVertName.textChanged.connect(self.updateSvert)
-        self.nmsName.textChanged.connect(self.updateNms)
-        self.thresholdName.textChanged.connect(self.updateThreshold)
-        self.hysteresisName.textChanged.connect(self.updateHysteresis)
+        self.openDirButton.clicked.connect(self.openFileFunc)
+
+        self.gblurName.textChanged.connect(lambda: self.updateFilename('gblur', self.gblurName.text()))
+        self.sobelMagName.textChanged.connect(lambda: self.updateFilename('smag', self.sobelMagName.text()))
+        self.sobelDirName.textChanged.connect(lambda: self.updateFilename('sdir', self.sobelDirName.text()))
+        self.sobelHorizName.textChanged.connect(lambda: self.updateFilename('shoriz', self.sobelHorizName.text()))
+        self.sobelVertName.textChanged.connect(lambda: self.updateFilename('svert', self.sobelVertName.text()))
+        self.nmsName.textChanged.connect(lambda: self.updateFilename('nms', self.nmsName.text()))
+        self.thresholdName.textChanged.connect(lambda: self.updateFilename('thresh', self.thresholdName.text()))
+        self.hysteresisName.textChanged.connect(lambda: self.updateFilename('hyst', self.hysteresisName.text()))
 
     def layout(self):
         formLayout = QtGui.QFormLayout()
@@ -799,29 +553,9 @@ class SaveAllDialog(QtGui.QDialog):
     def exit(self):
         self.close()
 
-    def updateGblur(self, text):
-        self.filenames['gblur'] = text
-
-    def updateSmag(self, text):
-        self.filenames['smag'] = text
-
-    def updateSdir(self, text):
-        self.filenames['sdir'] = text
-
-    def updateShoriz(self, text):
-        self.filenames['shoriz'] = text
-
-    def updateSvert(self, text):
-        self.filenames['svert'] = text
-
-    def updateNms(self, text):
-        self.filenames['nms'] = text
-
-    def updateThreshold(self, text):
-        self.filenames['thresh'] = text
-
-    def updateHysteresis(self, text):
-        self.filenames['hyst'] = text
+    def updateFilename(self, key, text):
+        self.filenames[key] = text
+        print(text)
 
     def setFileExt(self, text):
         self.fileExt = text
@@ -849,19 +583,21 @@ class SobelOptionsDialog(QtGui.QDialog):
         self.verticalOption = QtGui.QPushButton(dialogType)
         self.closeButton = QtGui.QPushButton('Close')
 
-        QtCore.QObject.connect(self.closeButton, QtCore.SIGNAL('clicked()'), self.exit)
+        self.closeButton.clicked.connect(self.exit)
 
         if dialogType == 'Show':
-            QtCore.QObject.connect(self.magnitudeOption, QtCore.SIGNAL('clicked()'), lambda: self.parent().showFunc(self.parent().parent().parent().I.smagnitude, 'gray'))
-            QtCore.QObject.connect(self.directionOption, QtCore.SIGNAL('clicked()'), lambda: self.parent().showFunc(self.parent().parent().parent().I.sdirection, 'gist_rainbow'))
-            QtCore.QObject.connect(self.horizontalOption, QtCore.SIGNAL('clicked()'), lambda: self.parent().showFunc(self.parent().parent().parent().I.shgradient, 'gray'))
-            QtCore.QObject.connect(self.verticalOption, QtCore.SIGNAL('clicked()'), lambda: self.parent().showFunc(self.parent().parent().parent().I.svgradient, 'gray'))
-        if dialogType == 'Save':
-            QtCore.QObject.connect(self.magnitudeOption, QtCore.SIGNAL('clicked()'), lambda: self.parent().saveFunc(self.parent().parent().parent().I.smagnitude))
-
-            QtCore.QObject.connect(self.directionOption, QtCore.SIGNAL('clicked()'), lambda: self.parent().saveFunc(self.parent().parent().parent().I.sdirection))
-            QtCore.QObject.connect(self.horizontalOption, QtCore.SIGNAL('clicked()'), lambda: self.parent().saveFunc(self.parent().parent().parent().I.shgradient))
-            QtCore.QObject.connect(self.verticalOption, QtCore.SIGNAL('clicked()'), lambda: self.parent().saveFunc(self.parent().parent().parent().I.svgradient))
+            func = self.parent().showFunc
+            self.magnitudeOption.clicked.connect(lambda: func(self.parent().I.smagnitude, 'gray'))
+            self.directionOption.clicked.connect(lambda: func(self.parent().I.sdirection, 'gist_rainbow'))
+            self.horizontalOption.clicked.connect(lambda: func(self.parent().I.shgradient, 'gray'))
+            self.verticalOption.clicked.connect(lambda: func(self.parent().I.svgradient,  'gray'))
+        else:
+            func = self.parent().saveFunc
+            self.magnitudeOption.clicked.connect(lambda: func(self.parent().I.smagnitude))
+            self.directionOption.clicked.connect(lambda: func(self.parent().I.sdirection))
+            self.horizontalOption.clicked.connect(lambda: func(self.parent().I.shgradient))
+            self.verticalOption.clicked.connect(lambda: func(self.parent().I.svgradient))
+        #Ask Liam: is it better to pass the data, rather than accessing it through the parent? encapsulation 'n' stuff? also interfaces
 
     def layout(self):
         #Create layout
@@ -913,7 +649,7 @@ class mplWindow(QtGui.QDialog):
         self.toolbar = navigationToolbar(self.display, self)
         self.closeButton = QtGui.QPushButton('Close')
 
-        QtCore.QObject.connect(self.closeButton, QtCore.SIGNAL('clicked()'), self.exit)
+        self.closeButton.clicked.connect(self.exit)
 
         boxLayout = QtGui.QVBoxLayout()
         boxLayout.addWidget(self.toolbar)
@@ -934,38 +670,37 @@ class WorkerThread(QtCore.QThread):
 
     def run(self):
         '''Starts the thread doing work when inbuilt start() is called'''
-        #Do stuff here
-        try: #Add more if not self.StopFlag around the updating things
+        try:
             if not self.stopFlag:
                 #Gaussian
                 self.emit(QtCore.SIGNAL('updateGaussianLabel'))
                 sigma = float(self.parent().gblurSigma.currentText())
                 radius = int(self.parent().gblurRadius.currentText())
-                self.parent().parent().parent().I.gaussian_(sigma, radius)
+                self.parent().I.gaussian_(sigma, radius)
                 self.emit(QtCore.SIGNAL('finishGaussian'))
 
             if not self.stopFlag:
                 #Sobel
                 self.emit(QtCore.SIGNAL('updateSobelLabel'))
-                self.parent().parent().parent().I.sobel_()
+                self.parent().I.sobel_()
                 self.emit(QtCore.SIGNAL('finishSobel'))
 
             if not self.stopFlag:
                 #NMS
                 self.emit(QtCore.SIGNAL('updateNmsLabel'))
-                self.parent().parent().parent().I.nms_()
+                self.parent().I.nms_()
                 self.emit(QtCore.SIGNAL('finishNms'))
 
             if not self.stopFlag:
                 #Threshold
                 self.emit(QtCore.SIGNAL('updateThresholdLabel'))
-                self.parent().parent().parent().I.threshold_()
+                self.parent().I.threshold_()
                 self.emit(QtCore.SIGNAL('finishThreshold'))
 
             if not self.stopFlag:
                 #Hysteresis
                 self.emit(QtCore.SIGNAL('updateHysteresisLabel'))
-                self.parent().parent().parent().I.hysteresis_()
+                self.parent().I.hysteresis_()
                 self.emit(QtCore.SIGNAL('finishHysteresis'))
 
             #Stop thread
@@ -1007,13 +742,8 @@ class App(QtGui.QApplication):
         self.main.show()
 
         #Connect exit buttons and safe closing
-        QtCore.QObject.connect(self.main.startWidget.quitButton, QtCore.SIGNAL('clicked()'),self.Exit)
-        QtCore.QObject.connect(self.main.optionsWidget.quitButton, QtCore.SIGNAL('clicked()'), self.Exit)
-        QtCore.QObject.connect(self.main.cannyWidget.quitButton, QtCore.SIGNAL('clicked()'), self.Exit)
-        QtCore.QObject.connect(self, QtCore.SIGNAL('lastWindowClosed()'),self.Exit)
-
-    def Exit(self):
-        self.exit(0)
+        self.main.cannyWidget.quitButton.clicked.connect(self.exit)
+        self.lastWindowClosed.connect(self.exit)
 
 if __name__ == '__main__':
     #Create QApplication

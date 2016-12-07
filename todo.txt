@@ -4,54 +4,46 @@ Plan:
 3: Non-Maximum Suppression [DONE]
 4: Hysteresis Thresholding [DONE]
 5: GUI
-	5.1 Requirements:
-		-Tick boxes to include/exclude stage - how the hell will that work???
-		-Timer
-		-Save all images at once - do a file structure thing to store all the images nicely, then add to design
 
 TODO:
--Store binary images rather than 0s and 255s?
+-Store binary images rather than 0s and 255s? Perhaps add an option to save as binary image
 
 -In write up:
 	-in HCI: gestalt principles of organisation
-	-in analysis research section: point out that thresholding hysteresis often split into two stages
+	-in analysis research section: point out that thresholding hysteresis will be split into two separate stages
 	-point out that progress bar is inferior to a timer - it is not known how much processing is needed so a progress bar is not suitable, timer lets you know it's still going
-	-point out that whilst i could have created a class that is inherited by canny window and options window, the functions used in each, whilst similar, are slightly different so it would not have been practical nor would it have saved any time/effort
-
--Data storage
+	-data storage
 
 -Compare to code bookmarked on Chrome:
 	-Does NMS give the same result - NO - try old NMS algorithm
-	-Connected component detection - recursive - is it faster?
+	-Connected component detection - recursive - is it faster (CHECK using timeit since python doesn't optimise recursion)
 	-Does my program actually remove weak edges that are left over?
 	-Compare entire program - where is it different and is it better
 	-Does thresholding method work better (probably, try it) kindaaaa?
-
--Fix NMS, or whatever else is wrong
-	-Why are there still some interpolation errors
-
--GUI:
-	-change all connections to be the new style(?)
-	-make a class that is inherited by canny window and options window that has the functions needed
-	-(in individual options) Add a 'load from current process' for options after gblur, 
-	so that you can go straight from gblur to sobel (for example) 
-	without having to save and then load
+	-Fix NMS, or whatever else is wrong
+		-Why are there still some interpolation errors
 
 -Fix thresholding:
 	-Can I threshold the image differently to get better thresholds
 	-Does the function work properly?
 	-Are there better methods of thresholding
 
+-GUI:
+	-fonts
+	-add a border around the timer? is that even possible
+	-final check to see if threads can be force terminated
+	-split into separate modules
+
 -Comment that shit:
 	-gaussian [DONE]
 	-convolution [DONE]
-	-nms - ugh do I have to?
+	-nms
 	-main
 	-sobel [DONE]
 	-hysteresis [DONE]
 	-threshold [DONE]
+	-gui
 
 Potential:
 -Change gaussian kernel radius to be 6*sigma
--Fiddle with algorithm for hysteresis to get it to work better (?)
 -Investigate dynamic thresholds
