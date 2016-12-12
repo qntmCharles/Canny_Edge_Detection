@@ -136,7 +136,7 @@ def threshold_image(image,low,high):
     return output
 
 #Interface function, to interact with main program
-def threshold(image,magnitude,suppressedImage):
+def threshold(image,magnitude,suppressedImage, lowThreshRatio,  highThreshRatio):
     #Calculate main threshold
     highThreshRatio = 0.275 #Ratio OF max gradient magnitude
     lowThreshRatio = 0.25 #Ratio OF highThreshRatio

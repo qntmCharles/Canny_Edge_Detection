@@ -6,7 +6,7 @@ getcontext().prec=15
 
 def checkExists(coordinates,shape):
     for i in range(len(coordinates)):
-        if coordinates[i] > shape[i%2] - 1:
+        if (coordinates[i] > shape[i%2] - 1) or (coordinates[i] < 0):
             return False
     return True
 
@@ -20,10 +20,23 @@ def interpolate(hVector,vVector,x1,x2):
 
     if (result > max(x1,x2)) and not (math.isclose(max(x1,x2),result)):
         print('Error')
+        print(result)
     elif (result < min(x1,x2)) and not (math.isclose(min(x1,x2),result)):
         print('Error')
+        print(result)
     else:
         return result
+
+def displayRegion(y,x,mag,shape):
+    a=[[],[],[]]
+    for i in range(-1,2):
+        for j in range(-1,2):
+            if checkExists((y+i,x+j),shape):
+                a[i+1].append(mag[y+i][x+j])
+            else:
+                a[i+1].append('-')
+    for row in a:
+        print(row)
 
 def nonMaximumSuppression(mag,magH,magV,direction):
     output = np.zeros(direction.shape)
@@ -36,6 +49,7 @@ def nonMaximumSuppression(mag,magH,magV,direction):
             h = magH[y][x]
             v = magV[y][x]
             shape = mag.shape
+            #displayRegion(y,x,mag,shape)
 
             if angle == pi:
                 index = 7
@@ -44,9 +58,10 @@ def nonMaximumSuppression(mag,magH,magV,direction):
 
             #\   |   /
             # \ 6|5 /
-            # 7\ | /4
-            #---------
-            # 0/ | \3
+            #7 \ | / 4
+            #_________
+            #
+            #0 / | \ 3
             # / 1|2 \
             #/   |   \
 
@@ -205,22 +220,35 @@ def nonMaximumSuppression(mag,magH,magV,direction):
 
             else:
                 print('Error: unclassified angle (',angle,')')
+            #print('Angle: ',angle*180/pi, 'Index: ',index)
+            #print('Sobel (h,v): ', h, v)
+            #print(gradient1, gradient2)
             if (gradient1 != None) and (gradient2 != None):
-                if (mag[y][x] >= gradient1) and (mag[y][x] >= gradient2):
+                if (mag[y][x] > gradient1) and (mag[y][x] > gradient2):
                    output[y][x] = mag[y][x]
+                   #print('Maximum')
                 else:
                     output[y][x] = 0
+                    #print('Not maximum')
             elif gradient1 != None:
-                if mag[y][x] >= gradient1:
+                if mag[y][x] > gradient1:
                     output[y][x] = mag[y][x]
+                    #print('Maximum')
                 else:
                     output[y][x] = 0
+                    #print('Not maximum')
             elif gradient2 != None:
-                if mag[y][x] >= gradient2:
+                if mag[y][x] > gradient2:
                     output[y][x] = mag[y][x]
+                    #print('Maximum')
                 else:
                     output[y][x] = 0
+                    #print('Not maximum')
             else:
                 output[y][x] = mag[y][x]
+                #print('Maximum')
+
+            #if y > 60:
+                #input()
 
     return output

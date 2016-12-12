@@ -10,29 +10,25 @@ TODO:
 
 -In write up:
 	-in HCI: gestalt principles of organisation
+	-in design: data flow table!
+	-in design: update /everything/
 	-in analysis research section: point out that thresholding hysteresis will be split into two separate stages
 	-point out that progress bar is inferior to a timer - it is not known how much processing is needed so a progress bar is not suitable, timer lets you know it's still going
 	-data storage
 
--Compare to code bookmarked on Chrome:
-	-Does NMS give the same result - NO - try old NMS algorithm
-	-Connected component detection - recursive - is it faster (CHECK using timeit since python doesn't optimise recursion)
-	-Does my program actually remove weak edges that are left over?
-	-Compare entire program - where is it different and is it better
-	-Does thresholding method work better (probably, try it) kindaaaa?
-	-Fix NMS, or whatever else is wrong
-		-Why are there still some interpolation errors
+-Hysteresis:
+	-Connected component detection - make it recursive - test if faster using timeit
 
--Fix thresholding:
-	-Can I threshold the image differently to get better thresholds
-	-Does the function work properly?
-	-Are there better methods of thresholding
+-Fix NMS: 
+	-pretty sure checkExists works, for indices on the left side of the image
+	-test this ^
+
+-Thresholding:
+	-remove otsu
 
 -GUI:
-	-fonts
-	-add a border around the timer? is that even possible
-	-final check to see if threads can be force terminated
 	-split into separate modules
+	-add a focus event (if that's what it's meant to be?) that will focus on the right window when a button that has already been clicked is clicked e.g. image show
 
 -Comment that shit:
 	-gaussian [DONE]

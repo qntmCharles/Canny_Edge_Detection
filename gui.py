@@ -50,6 +50,8 @@ class CannyWindow(QtGui.QWidget):
         self.I = None
         self.sigma = 1.0
         self.radius = 5
+        self.lowThresh = 0.275 #OF highThresh - effective low threshold is low * high
+        self.highThresh = 0.25
         self.minutes = 0
         self.seconds = 0
 
@@ -84,6 +86,9 @@ class CannyWindow(QtGui.QWidget):
         self.resetButton.setMaximumWidth(80)
         self.resetButton.hide()
 
+        self.gblurSigmaLabel = QtGui.QLabel('Sigma')
+        self.gblurRadiusLabel = QtGui.QLabel('Radius')
+
         labelFont = QtGui.QFont()
         labelFont.setPointSize(11)
         self.gblurLabel = QtGui.QLabel('Gaussian Blur: not started')
@@ -92,6 +97,8 @@ class CannyWindow(QtGui.QWidget):
         self.sobelLabel.setFont(labelFont)
         self.nmsLabel = QtGui.QLabel('Non Maximum Suppression: not started')
         self.nmsLabel.setFont(labelFont)
+        self.threshLowLabel = QtGui.QLabel('Low')
+        self.threshHighLabel = QtGui.QLabel('High')
         self.thresholdLabel = QtGui.QLabel('Thresholding: not started')
         self.thresholdLabel.setFont(labelFont)
         self.hysteresisLabel = QtGui.QLabel('Hysteresis: not started')
@@ -129,13 +136,27 @@ class CannyWindow(QtGui.QWidget):
         self.gblurSigma = QtGui.QComboBox()
         self.gblurSigma.addItems(['0.5','0.6','0.7','0.8','0.9','1.0','1.1','1.2','1.3','1.4','1.5','2.0','2.5','3.0'])
         self.gblurSigma.setCurrentIndex(5)
+        #Force widget to be width 70
+        self.gblurSigma.setMaximumWidth(70)
+        self.gblurSigma.setMinimumWidth(70)
+
         self.gblurRadius = QtGui.QComboBox()
         self.gblurRadius.addItems(['3','5','7','9','11'])
         self.gblurRadius.setCurrentIndex(1)
+        #Force widget to be width 70
+        self.gblurRadius.setMaximumWidth(70)
+        self.gblurRadius.setMinimumWidth(70)
+
+        self.threshLow = QtGui.QLineEdit('0.275')
+        self.threshLow.setMaximumWidth(70)
+        self.threshHigh = QtGui.QLineEdit('0.25')
+        self.threshHigh.setMaximumWidth(70)
 
         self.openFileButton.clicked.connect(self.openFileFunc)
         self.startButton.clicked.connect(self.startFunctionCheck)
         self.showFileButton.clicked.connect(lambda: self.showFunc(self.I.original, 'gray'))
+        self.threshLow.textChanged.connect(lambda: self.updateThresholds('low', self.threshLow.text()))
+        self.threshHigh.textChanged.connect(lambda: self.updateThresholds('high', self.threshHigh.text()))
         self.gblurSave.clicked.connect(lambda: self.saveFunc(self.I.gblur))
         self.gblurShow.clicked.connect(lambda: self.showFunc(self.I.gblur, 'gray'))
         self.sobelSave.clicked.connect(lambda: self.sobelOptionsFunc('Save'))
@@ -164,26 +185,44 @@ class CannyWindow(QtGui.QWidget):
         hline.setFrameShape(QtGui.QFrame.HLine)
         hline.setFrameShadow(QtGui.QFrame.Plain)
         gridLayout.addWidget(hline,2,0,2,-1,QtCore.Qt.AlignTop)
+
         self.startCancelLayout = QtGui.QHBoxLayout()
         self.startCancelLayout.addWidget(self.startButton)
         self.startCancelLayout.addWidget(self.cancelButton)
         gridLayout.addLayout(self.startCancelLayout,2,0,2,-1,QtCore.Qt.AlignCenter)
 
         gridLayout.addWidget(self.threadLabel,3,0)
-        gridLayout.addWidget(QtGui.QLabel('Sigma'),3,1,QtCore.Qt.AlignBottom)
-        gridLayout.addWidget(QtGui.QLabel('Radius'),3,2,QtCore.Qt.AlignBottom)
+        #gridLayout.addWidget(self.gblurSigmaLabel,3,1,QtCore.Qt.AlignBottom)
+        #gridLayout.addWidget(self.gblurRadiusLabel,3,2,QtCore.Qt.AlignBottom)
 
         gridLayout.addWidget(self.gblurLabel,4,0)
-        gridLayout.addWidget(self.gblurSigma,4,1,QtCore.Qt.AlignVCenter)
-        gridLayout.addWidget(self.gblurRadius,4,2,QtCore.Qt.AlignVCenter)
+        self.gblurLayout = QtGui.QFormLayout()
+        self.gblurLayout.addRow(QtGui.QLabel('Gaussian Parameters'))
+        self.gblurLayout.addRow(self.gblurSigmaLabel,self.gblurRadiusLabel)
+        self.gblurLayout.addRow(self.gblurSigma, self.gblurRadius)
+        gridLayout.addLayout(self.gblurLayout, 4,1,1,2)
+        #gridLayout.addWidget(self.gblurSigma,4,1,QtCore.Qt.AlignVCenter)
+        #igridLayout.addWidget(self.gblurRadius,4,2,QtCore.Qt.AlignVCenter)
 
         gridLayout.addWidget(self.sobelLabel,5,0)
         gridLayout.addWidget(self.nmsLabel,6,0)
 
+        #gridLayout.addWidget(self.threshLowLabel,6,1,QtCore.Qt.AlignBottom)
+        #gridLayout.addWidget(self.threshHighLabel,6,2,QtCore.Qt.AlignBottom)
+
         #To prevent label from moving show & save widgets
         self.nmsLabel.setMinimumWidth(350)
 
+        self.threshLayout = QtGui.QFormLayout()
+        self.threshLayout.addRow(QtGui.QLabel('Thresholds'))
+        self.threshLayout.addRow(self.threshLowLabel, self.threshHighLabel)
+        self.threshLayout.addRow(self.threshLow, self.threshHigh)
+
         gridLayout.addWidget(self.thresholdLabel,7,0)
+        gridLayout.addLayout(self.threshLayout,7,1,1,2)
+        #gridLayout.addWidget(QtGui.QLabel('Thresholds'),6,1)
+        #gridLayout.addWidget(self.threshLow,7,1,QtCore.Qt.AlignVCenter)
+        #gridLayout.addWidget(self.threshHigh,7,2,QtCore.Qt.AlignVCenter)
         gridLayout.addWidget(self.hysteresisLabel,8,0)
 
         gridLayout.addWidget(self.saveAllButton,9,4,QtCore.Qt.AlignCenter)
@@ -206,26 +245,55 @@ class CannyWindow(QtGui.QWidget):
         #Set layout
         self.setLayout(gridLayout)
 
+    def updateThresholds(self, threshold, text):
+        flag = True
+        try:
+            text = float(text)
+        except:
+            self.errorMessage('Thresholds Must Be Numerical')
+            flag = False
+
+        if flag:
+            if (text>1) or (text<0):
+                self.errorMessage('Thresholds Must Be Between 0 and 1')
+
+            if threshold == 'low':
+                self.lowThresh = text
+            else:
+                self.highThresh = text
+
+
     def resetFunc(self):
-        if self.worker.isRunning(): #Does this even work?
-            self.terminateThread()
-        else:
-            self.saveAllButton.hide()
+        self.saveAllButton.hide()
 
         for i in range(0,2):
             for j in range(0,5):
                 self.widgets[i][j].hide()
 
         self.I.__init__(self.I.original)
+        self.timerLabel.setText('00:00')
         self.resetButton.hide()
 
     def terminateThread(self):
         if self.worker:
-            self.cancelButton.setEnabled(False)
-            self.cancelButton.setWindowOpacity(0.5)
-            self.threadLabel.setText('Waiting for thread termination...')
-            self.threadLabel.activated = True
+            #Tell worker to stop running
             self.worker.stopFlag = True
+
+            #Disconnect all connections with worker
+            self.worker.finished.disconnect(self.finishedThreadFunc)
+            QtCore.QObject.disconnect(self.worker, QtCore.SIGNAL('updateGaussianLabel'), self.gblurUpdateConnection)
+            QtCore.QObject.disconnect(self.worker, QtCore.SIGNAL('finishGaussian'), self.gblurFinishConnection)
+            QtCore.QObject.disconnect(self.worker, QtCore.SIGNAL('updateSobelLabel'), self.sobelUpdateConnection)
+            QtCore.QObject.disconnect(self.worker, QtCore.SIGNAL('finishSobel'), self.sobelFinishConnection)
+            QtCore.QObject.disconnect(self.worker, QtCore.SIGNAL('updateNmsLabel'), self.nmsUpdateConnection)
+            QtCore.QObject.disconnect(self.worker, QtCore.SIGNAL('finishNms'), self.nmsFinishConnection)
+            QtCore.QObject.disconnect(self.worker, QtCore.SIGNAL('updateThresholdLabel'), self.threshUpdateConnection)
+            QtCore.QObject.disconnect(self.worker, QtCore.SIGNAL('finishThreshold'), self.threshFinishConnection)
+            QtCore.QObject.disconnect(self.worker, QtCore.SIGNAL('updateHysteresisLabel'), self.hystUpdateConnection)
+            QtCore.QObject.disconnect(self.worker, QtCore.SIGNAL('finishHysteresis'), self.hystFinishConnection)
+
+            #Remove reference to current worker
+            self.worker = None
 
             self.gblurLabel.activated = False
             self.sobelLabel.activated = False
@@ -241,6 +309,7 @@ class CannyWindow(QtGui.QWidget):
 
             self.guiTimer.stop()
             self.timerLabel.setText('00:00')
+            self.finishedThreadFunc()
         else:
             self.errorMessage('Thread Does Not Exist')
 
@@ -327,6 +396,7 @@ class CannyWindow(QtGui.QWidget):
             saveButton.show()
             showButton.show()
             if flag:
+                #Show saveAllButton here - saves trouble when using finishThread function elsewhere
                 self.saveAllButton.show()
 
     def openFileFunc(self):
@@ -365,6 +435,9 @@ class CannyWindow(QtGui.QWidget):
             self.threadLabel.setText('Waiting for thread termination'+self.dotDotDot())
 
     def startFunction(self):
+        #Ensure no data from previous processes
+        self.resetFunc()
+
         #Timer
         self.seconds = 0
         self.minutes = 0
@@ -394,26 +467,31 @@ class CannyWindow(QtGui.QWidget):
         finishHysteresis = QtCore.pyqtSignal()
 
         #Connect signals
-        QtCore.QObject.connect(self.worker, QtCore.SIGNAL('updateGaussianLabel'),
-                lambda: self.updateFromThreadFunc(self.gblurLabel, 'Gaussian Blur: processing.'))
-        QtCore.QObject.connect(self.worker, QtCore.SIGNAL('finishGaussian'),
-                lambda: self.finishFromThreadFunc(self.gblurLabel, 'Gaussian Blur: complete', self.gblurSave, self.gblurShow))
-        QtCore.QObject.connect(self.worker, QtCore.SIGNAL('updateSobelLabel'),
-                lambda: self.updateFromThreadFunc(self.sobelLabel, 'Sobel Filter: processing.'))
-        QtCore.QObject.connect(self.worker, QtCore.SIGNAL('finishSobel'),
-                lambda: self.finishFromThreadFunc(self.sobelLabel, 'Sobel Filter: complete', self.sobelSave, self.sobelShow))
-        QtCore.QObject.connect(self.worker, QtCore.SIGNAL('updateNmsLabel'),
-                lambda: self.updateFromThreadFunc(self.nmsLabel, 'Non Maximum Suppression: processing.'))
-        QtCore.QObject.connect(self.worker, QtCore.SIGNAL('finishNms'),
-                lambda: self.finishFromThreadFunc(self.nmsLabel, 'Non Maximum Suppression: complete', self.nmsSave, self.nmsShow))
-        QtCore.QObject.connect(self.worker, QtCore.SIGNAL('updateThresholdLabel'),
-                lambda: self.updateFromThreadFunc(self.thresholdLabel, 'Thresholding: processing.'))
-        QtCore.QObject.connect(self.worker, QtCore.SIGNAL('finishThreshold'),
-                lambda: self.finishFromThreadFunc(self.thresholdLabel, 'Thresholding: complete', self.thresholdSave, self.thresholdShow))
-        QtCore.QObject.connect(self.worker, QtCore.SIGNAL('updateHysteresisLabel'),
-                lambda: self.updateFromThreadFunc(self.hysteresisLabel, 'Hysteresis: processing.'))
-        QtCore.QObject.connect(self.worker, QtCore.SIGNAL('finishHysteresis'),
-                lambda: self.finishFromThreadFunc(self.hysteresisLabel, 'Hysteresis: complete', self.hysteresisSave, self.hysteresisShow, True))
+        self.gblurUpdateConnection = lambda: self.updateFromThreadFunc(self.gblurLabel, 'Gaussian Blur: processing.')
+        QtCore.QObject.connect(self.worker, QtCore.SIGNAL('updateGaussianLabel'), self.gblurUpdateConnection)
+        self.gblurFinishConnection = lambda: self.finishFromThreadFunc(self.gblurLabel, 'Gaussian Blur: complete', self.gblurSave, self.gblurShow)
+        QtCore.QObject.connect(self.worker, QtCore.SIGNAL('finishGaussian'), self.gblurFinishConnection)
+
+        self.sobelUpdateConnection = lambda: self.updateFromThreadFunc(self.sobelLabel, 'Sobel Filter: processing.')
+        QtCore.QObject.connect(self.worker, QtCore.SIGNAL('updateSobelLabel'), self.sobelUpdateConnection)
+        self.sobelFinishConnection = lambda: self.finishFromThreadFunc(self.sobelLabel, 'Sobel Filter: complete', self.sobelSave, self.sobelShow)
+        QtCore.QObject.connect(self.worker, QtCore.SIGNAL('finishSobel'), self.sobelFinishConnection)
+
+        self.nmsUpdateConnection = lambda: self.updateFromThreadFunc(self.nmsLabel, 'Non Maximum Suppression: processing.')
+        QtCore.QObject.connect(self.worker, QtCore.SIGNAL('updateNmsLabel'), self.nmsUpdateConnection)
+        self.nmsFinishConnection = lambda: self.finishFromThreadFunc(self.nmsLabel, 'Non Maximum Suppression: complete', self.nmsSave, self.nmsShow)
+        QtCore.QObject.connect(self.worker, QtCore.SIGNAL('finishNms'), self.nmsFinishConnection)
+
+        self.threshUpdateConnection = lambda: self.updateFromThreadFunc(self.thresholdLabel, 'Thresholding: processing.')
+        QtCore.QObject.connect(self.worker, QtCore.SIGNAL('updateThresholdLabel'), self.threshUpdateConnection)
+        self.threshFinishConnection = lambda: self.finishFromThreadFunc(self.thresholdLabel, 'Thresholding: complete', self.thresholdSave, self.thresholdShow)
+        QtCore.QObject.connect(self.worker, QtCore.SIGNAL('finishThreshold'), self.threshFinishConnection)
+
+        self.hystUpdateConnection = lambda: self.updateFromThreadFunc(self.hysteresisLabel, 'Hysteresis: processing.')
+        QtCore.QObject.connect(self.worker, QtCore.SIGNAL('updateHysteresisLabel'), self.hystUpdateConnection)
+        self.hystFinishConnection = lambda: self.finishFromThreadFunc(self.hysteresisLabel, 'Hysteresis: complete', self.hysteresisSave, self.hysteresisShow, True)
+        QtCore.QObject.connect(self.worker, QtCore.SIGNAL('finishHysteresis'), self.hystFinishConnection)
+
         self.worker.finished.connect(self.finishedThreadFunc)
 
         #Start threads
@@ -694,7 +772,7 @@ class WorkerThread(QtCore.QThread):
             if not self.stopFlag:
                 #Threshold
                 self.emit(QtCore.SIGNAL('updateThresholdLabel'))
-                self.parent().I.threshold_()
+                self.parent().I.threshold_(self.parent().lowThresh, self.parent().highThresh)
                 self.emit(QtCore.SIGNAL('finishThreshold'))
 
             if not self.stopFlag:
@@ -712,6 +790,7 @@ class WorkerThread(QtCore.QThread):
             self.running = False
 
     def __del__(self):
+        print('this got called')
         #Set stopping flag
         self.stopFlag = True
         #Wait for thread to finish processing before terminating

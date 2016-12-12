@@ -5,15 +5,17 @@ Created on Sun Jul 31 12:57:42 2016
 """
 from __future__ import division
 from PIL import Image as im
+from scipy import ndimage as ndi
 import numpy as np
 import math
 import matplotlib.pyplot as plt
 
 from gaussian import gaussian
 from sobel import sobel
-from nms import nonMaximumSuppression
+#from nms_test import nonMaximumSuppression
+from nms import  nonMaximumSuppression
 from hysteresis import hysteresis
-from threshold import threshold,generateHistogram
+from threshold import threshold, generateHistogram
 
 class Image():
     def __init__(self,originalImage):
@@ -56,7 +58,7 @@ class Image():
 
     def gaussian_(self,sigma,width):
         self.gblur = gaussian(sigma,width,self.original)
-        #Is it possible to pass an object to a function called in one of it's methods?
+
     def sobel_(self):
         self.smagnitude,self.sdirection,self.shgradient,self.svgradient = sobel(self.gblur)
         self.smagnitude = self.smagnitude.astype('float')
@@ -64,44 +66,54 @@ class Image():
 
     def nms_(self):
         self.suppressed = nonMaximumSuppression(self.smagnitude,self.shgradient,self.svgradient,self.sdirection)
+        #self.suppressed = nonMaximumSuppression(self.smagnitude, self.sdirection)
 
-    def threshold_(self):
-        self.thresholded = threshold(self.original,self.smagnitude,self.suppressed)
+    def threshold_(self, lowThreshold, highThreshold):
+        self.thresholded = threshold(self.original,self.smagnitude,self.suppressed, lowThreshold, highThreshold)
 
     def hysteresis_(self):
         self.final = hysteresis(self.thresholded)
 
 def main():
     I = Image(np.asarray(im.open('test.png').convert('L'),dtype=np.float32))
+    #I = np.zeros((128,128))
+    #I[32:-32,32:-32]=1
+    #I = ndi.rotate(I,15,mode='constant')
+    #I = ndi.gaussian_filter(I,4)
+    #I += 0.2*np.random.random(I.shape)
+    #I = Image(I)
+
     print('Performing Gaussian blur...')
-    I.gaussian_(1,5)
+    I.gaussian_(2,5)
     print('Gaussian blur complete!')
-    choice = str(input('Show blurred image? (y/n)'))
+    """choice = str(input('Show blurred image? (y/n)'))
     if choice == 'y':
         im.fromarray(I.gblur).show()
     input()
+    """
     #Image.fromarray(gaussian_result.astype(np.uint8)).show()
     print('Performing Sobel convolution...')
     I.sobel_()
     print('Sobel convolution complete!')
-    choice = str(input('Show all sobel results? (y/n)'))
-    if choice == 'y':
-        im.fromarray(I.shgradient).show()
-        im.fromarray(I.svgradient).show()
-        im.fromarray(I.smagnitude).show()
-    input()
+    """choice = str(input('Show all sobel results? (y/n)'))
+    if choice == 'y':"""
+        #im.fromarray(I.shgradient).show()
+        #im.fromarray(I.svgradient).show()
+    #im.fromarray(I.smagnitude).show()
+    #plt.imshow(I.sdirection)
+    #plt.colorbar()
+    #plt.show()
+    #input()
     print('Performing non maximum suppression...')
     I.nms_()
-    choice = str(input('Show suppressed image? (y/n)'))
-    if choice == 'y':
-        im.fromarray(I.suppressed).show()
+    im.fromarray(I.suppressed).show()
     input()
     print('Non maximum suppression complete!')
-    choice = str(input('Show suppressed image histogram? (y/n)'))
+    """choice = str(input('Show suppressed image histogram? (y/n)'))
     if choice == 'y':
         h = generateHistogram(I.suppressed)
         plt.bar(h.keys(),h.values(),1)
-        plt.show()
+        plt.show()"""
     print('Thresholding image...')
     I.threshold_()
     print('Thresholding complete!')
