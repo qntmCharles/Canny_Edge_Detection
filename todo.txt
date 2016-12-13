@@ -3,11 +3,9 @@ Plan:
 2: Sobel [DONE]
 3: Non-Maximum Suppression [DONE]
 4: Hysteresis Thresholding [DONE]
-5: GUI
+5: GUI [DONE]
 
 TODO:
--Store binary images rather than 0s and 255s? Perhaps add an option to save as binary image
-
 -In write up:
 	-in HCI: gestalt principles of organisation
 	-in design: data flow table!
@@ -16,28 +14,37 @@ TODO:
 	-point out that progress bar is inferior to a timer - it is not known how much processing is needed so a progress bar is not suitable, timer lets you know it's still going
 	-data storage
 
--Hysteresis:
-	-Connected component detection - make it recursive - test if faster using timeit
+-Testing:
+	-deliberately break some things then fix them
+	-make sure the core objectives are shown to have been met
+	-use the problem with NMS (the kernels being backwards and the >=) as an example
+	-checkExists test? kinda boring...
+	-time the recursive and procedural versions of hysteresis
+	-check timer is accurate
+	-gaussian kernel values test - before normalisation and then show that normalisation needed
+	-tests for NMS showing displayRegion, interpolated stuff etc
+	-otsu testing?? (if kept)
+	-GUI testing on separate platforms
 
--Fix NMS: 
-	-pretty sure checkExists works, for indices on the left side of the image
-	-test this ^
+-Evaluation
+	-GUI:
+		-A focus event when a window is opened by a button, but then disappears - to stop it being hidden by the main window
 
 -Thresholding:
-	-remove otsu
+	-remove otsu(?)
+	-if having otsu increases the marks since it's a complex maths thing, keep it - ask Liam
 
 -GUI:
-	-split into separate modules
-	-add a focus event (if that's what it's meant to be?) that will focus on the right window when a button that has already been clicked is clicked e.g. image show
+	-ask Liam about encapsulation 'n' stuff, do /Liam in gui.py
 
 -Comment that shit:
 	-gaussian [DONE]
 	-convolution [DONE]
 	-nms
 	-main
-	-sobel [DONE]
-	-hysteresis [DONE]
-	-threshold [DONE]
+	-sobel
+	-hysteresis 
+	-threshold 
 	-gui
 
 Potential:
