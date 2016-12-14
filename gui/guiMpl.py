@@ -7,7 +7,7 @@ from matplotlib.figure import Figure
 class mplCanvas(FigCanvas):
     """Figure canvas to show matplotlib imshow plot."""
     def __init__(self, parent, data, colourmap):
-        fig = Figure(figsize=(5,4))
+        fig = Figure(figsize=(8,6))
         self.axes = fig.add_subplot(111)
         FigCanvas.__init__(self,fig)
         self.setParent(parent)
@@ -34,13 +34,16 @@ class mplWindow(QtGui.QDialog):
         self.display = mplCanvas(self, figureData, colourmap)
         self.toolbar = navigationToolbar(self.display, self)
         self.closeButton = QtGui.QPushButton('Close')
+        self.closeButton.setMaximumWidth(100)
 
         self.closeButton.clicked.connect(self.exit)
 
         boxLayout = QtGui.QVBoxLayout()
         boxLayout.addWidget(self.toolbar)
         boxLayout.addWidget(self.display)
-        boxLayout.addWidget(self.closeButton)
+        self.closeButtonLayout = QtGui.QHBoxLayout()
+        self.closeButtonLayout.addWidget(self.closeButton)
+        boxLayout.addLayout(self.closeButtonLayout)
         self.setLayout(boxLayout)
 
     def exit(self):

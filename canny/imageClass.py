@@ -1,6 +1,7 @@
 import numpy as np
 from .gaussian import gaussian
 from .sobel import sobel
+from .nms import nonMaximumSuppression
 from .threshold import threshold
 from .hysteresis import hysteresis
 from .hysteresis import Queue

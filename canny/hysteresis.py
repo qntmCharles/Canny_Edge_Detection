@@ -1,6 +1,6 @@
 from .nms import checkExists
 import numpy as np
-import math
+import math, sys
 
 class Queue():
     """Implementation of a queue (FIFO) data structure."""
@@ -46,6 +46,7 @@ def findConnectedEdges(mag, y, x):
     return mag
 
 def hysteresis(image, strongEdges):
+    sys.setrecursionlimit(image.shape[0]*image.shape[1])
     while not strongEdges.isEmpty():
         coords = strongEdges.dequeue()
         output = findConnectedEdges(image, coords[0], coords[1])

@@ -1,6 +1,5 @@
 from PyQt4 import QtCore, QtGui
-#from ..canny.imageClass import Image
-from .guiMain import App
+import time
 
 class WorkerThread(QtCore.QThread):
     '''Handles processing and functionality'''
@@ -70,6 +69,7 @@ class BackgroundThread(QtCore.QThread):
 
     def run(self):
         '''Starts the thread doing work when inbuilt start() is called'''
+        from .guiApp import App
         #Update GUI every 0.1 seconds to prevent GUI lock
         while self.worker.running:
             App.processEvents()

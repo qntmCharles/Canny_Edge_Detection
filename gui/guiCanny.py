@@ -1,7 +1,7 @@
 from PyQt4 import QtCore, QtGui
 from PIL import Image as im
 import numpy as np
-from ..canny.imageClass import Image
+from canny.imageClass import Image
 from .guiMpl import mplWindow
 from .guiSobelDialog import SobelOptionsDialog
 from .guiThreads import BackgroundThread, WorkerThread

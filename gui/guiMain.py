@@ -35,19 +35,6 @@ class MainWindow(QtGui.QMainWindow):
         self.cannyWidget = CannyWindow(self)
         self.setCentralWidget(self.cannyWidget)
 
-class App(QtGui.QApplication):
-    def __init__(self,*args):
-        #Initialise
-        app = QtGui.QApplication.__init__(self,*args)
-        #Initialise main window
-        self.main = MainWindow()
-        self.main.resize(500,500)
-        self.main.show()
-
-        #Connect exit buttons and ensure safe closing
-        self.main.cannyWidget.quitButton.clicked.connect(self.exit)
-        self.lastWindowClosed.connect(self.exit)
-
 """if __name__ == '__main__':
     #Create QApplication
     app = App(sys.argv)
