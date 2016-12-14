@@ -1,7 +1,6 @@
-"""from __future__ import division
-from nms import checkExists
+from .nms import checkExists
 import numpy as np
-import math"""
+import math
 
 class Queue():
     """Implementation of a queue (FIFO) data structure."""

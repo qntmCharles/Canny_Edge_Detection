@@ -1,27 +1,23 @@
-"""import sys, time
-sys.path.insert(0,'/home/cwp/NEA/')
-
 from PyQt4 import QtCore, QtGui
-from PIL import Image as im
-import numpy as np
+from .guiCanny import CannyWindow
 
 #Force matplotlib to use qt4 backends
 #from matplotlib import use
 #use('Qt4Agg')
 
-from matplotlib import pyplot as plt
+#from matplotlib import pyplot as plt
 #Matplotlib backends for qt4 to show images
-from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigCanvas
-from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavBar
-from matplotlib.figure import Figure
+#from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigCanvas
+#from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavBar
+#from matplotlib.figure import Figure
 
 #Import Image class
-from main import Image
-import sys
-sys.path.insert(0,'/home/cwp/')
-import NEA
-import NEA.canny
-import NEA.gui"""
+#from main import Image
+#import sys
+#sys.path.insert(0,'/home/cwp/')
+#import NEA
+#import NEA.canny
+#import NEA.gui"""
 
 class MainWindow(QtGui.QMainWindow):
     """Main window for application."""
@@ -48,7 +44,7 @@ class App(QtGui.QApplication):
         self.main.resize(500,500)
         self.main.show()
 
-        #Connect exit buttons and safe closing
+        #Connect exit buttons and ensure safe closing
         self.main.cannyWidget.quitButton.clicked.connect(self.exit)
         self.lastWindowClosed.connect(self.exit)
 

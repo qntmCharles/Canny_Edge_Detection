@@ -1,3 +1,5 @@
+from PyQt4 import QtGui, QtCore
+
 class SobelOptionsDialog(QtGui.QDialog):
     def __init__(self, parent, dialogType):
         super(SobelOptionsDialog, self).__init__(parent)

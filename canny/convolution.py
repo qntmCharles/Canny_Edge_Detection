@@ -1,8 +1,6 @@
-"""from __future__ import division
 import math
-import numpy as np"""
+import numpy as np
 
-channels=1 #Is this needed?
 def convolution(I,k):
     #Check if kernel is symmetrical
     if k.shape[0] != k.shape[1]:

@@ -1,6 +1,6 @@
-from PIL import Image as im
-import numpy as np
-import math
+import matplotlib
+
+matplotlib.use('Qt4Agg')
 
 import NEA.canny
 import NEA.gui

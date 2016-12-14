@@ -1,5 +1,11 @@
-"""from PyQt4 import QtCore, QtGui
-from main import Image"""
+from PyQt4 import QtCore, QtGui
+from PIL import Image as im
+import numpy as np
+from ..canny.imageClass import Image
+from .guiMpl import mplWindow
+from .guiSobelDialog import SobelOptionsDialog
+from .guiThreads import BackgroundThread, WorkerThread
+from .guiSaveDialog import SaveAllDialog
 
 class CannyWindow(QtGui.QWidget):
     def __init__(self, parent):

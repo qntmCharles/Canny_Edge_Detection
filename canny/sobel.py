@@ -1,11 +1,10 @@
-"""from __future__ import division
 import numpy as np
 import math
-from matplotlib import pyplot as plt
 from decimal import *
-from convolution import convolution
+from .convolution import convolution
 
-getcontext().prec=15"""
+getcontext().prec=15
+#Does this actually help anything? ^
 
 def sobel(image):
     #Sobel horiz/vert kernels

@@ -1,7 +1,7 @@
-"""from __future__ import division
+#Remove this in the final version, not needed
 from matplotlib import pyplot as plt
+import math
 import numpy as np
-import math"""
 
 class Queue():
     """Implementation of a queue (FIFO) data structure."""

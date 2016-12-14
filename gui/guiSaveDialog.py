@@ -1,3 +1,5 @@
+from PyQt4 import QtCore, QtGui
+
 class SaveAllDialog(QtGui.QDialog):
     def __init__(self, parent):
         super(SaveAllDialog, self).__init__(parent)

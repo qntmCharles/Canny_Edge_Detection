@@ -1,7 +1,6 @@
-"""from __future__ import division
 import math
 import numpy as np
-from convolution import convolution"""
+from .convolution import convolution
 
 def calculateValue(x,y,sigma):
     #Return value from gaussian distribution formula for x,y

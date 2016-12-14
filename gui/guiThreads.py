@@ -1,3 +1,7 @@
+from PyQt4 import QtCore, QtGui
+#from ..canny.imageClass import Image
+from .guiMain import App
+
 class WorkerThread(QtCore.QThread):
     '''Handles processing and functionality'''
     def __init__(self, parent):

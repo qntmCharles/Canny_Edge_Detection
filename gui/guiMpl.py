@@ -1,3 +1,9 @@
+from PyQt4 import QtCore, QtGui
+
+from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigCanvas
+from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavBar
+from matplotlib.figure import Figure
+
 class mplCanvas(FigCanvas):
     """Figure canvas to show matplotlib imshow plot."""
     def __init__(self, parent, data, colourmap):
