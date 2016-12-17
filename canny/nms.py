@@ -246,7 +246,4 @@ def nonMaximumSuppression(mag,magH,magV,direction):
                 output[y][x] = mag[y][x]
                 #print('Maximum')
 
-            #if y > 60:
-                #input()
-
     return output

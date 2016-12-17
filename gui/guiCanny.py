@@ -126,6 +126,13 @@ class CannyWindow(QtGui.QWidget):
         self.threshLow.setMaximumWidth(70)
         self.threshHigh = QtGui.QLineEdit('0.25')
         self.threshHigh.setMaximumWidth(70)
+        self.thresholdOption = QtGui.QButtonGroup()
+        self.thresholdAuto = True
+        self.automaticOption = QtGui.QRadioButton('Automatic Threshold')
+        self.automaticOption.setChecked(True)
+        self.thresholdOption.addButton(self.automaticOption)
+        self.manualOption = QtGui.QRadioButton('Manual Threshold')
+        self.thresholdOption.addButton(self.manualOption)
 
         self.openFileButton.clicked.connect(self.openFileFunc)
         self.startButton.clicked.connect(self.startFunctionCheck)
@@ -138,12 +145,27 @@ class CannyWindow(QtGui.QWidget):
         self.sobelShow.clicked.connect(lambda: self.sobelOptionsFunc('Show'))
         self.nmsSave.clicked.connect(lambda: self.saveFunc(self.I.suppressed))
         self.nmsShow.clicked.connect(lambda: self.showFunc(self.I.suppressed, 'gray'))
+        self.manualOption.toggled.connect(lambda: self.handleThresholdOptions('manual',True))
+        self.automaticOption.toggled.connect(lambda: self.handleThresholdOptions('auto'))
         self.thresholdSave.clicked.connect(lambda: self.saveFunc(self.I.thresholded))
         self.thresholdShow.clicked.connect(lambda: self.showFunc(self.I.thresholded, 'gray'))
         self.hysteresisShow.clicked.connect(lambda: self.showFunc(self.I.final, 'gray'))
         self.saveAllButton.clicked.connect(self.saveAllFunc)
         self.cancelButton.clicked.connect(self.terminateThread)
         self.resetButton.clicked.connect(self.resetFunc)
+
+    def handleThresholdOptions(self, option, Flag=None):
+        if option == 'manual':
+            self.threshHighLabel.show()
+            self.threshHigh.show()
+            self.threshLowLabel.show()
+            self.threshLow.show()
+        else:
+            self.thresholdAuto = not self.thresholdAuto
+            self.threshHighLabel.hide()
+            self.threshHigh.hide()
+            self.threshLowLabel.hide()
+            self.threshLow.hide()
 
     def layout(self):
         #Create layout
@@ -182,22 +204,19 @@ class CannyWindow(QtGui.QWidget):
         gridLayout.addWidget(self.sobelLabel,5,0)
         gridLayout.addWidget(self.nmsLabel,6,0)
 
-        #gridLayout.addWidget(self.threshLowLabel,6,1,QtCore.Qt.AlignBottom)
-        #gridLayout.addWidget(self.threshHighLabel,6,2,QtCore.Qt.AlignBottom)
-
         #To prevent label from moving show & save widgets
         self.nmsLabel.setMinimumWidth(350)
 
+
         self.threshLayout = QtGui.QFormLayout()
-        self.threshLayout.addRow(QtGui.QLabel('Thresholds'))
+        self.threshLayout.addRow(self.automaticOption)
+        self.threshLayout.addRow(self.manualOption)
         self.threshLayout.addRow(self.threshLowLabel, self.threshHighLabel)
         self.threshLayout.addRow(self.threshLow, self.threshHigh)
 
         gridLayout.addWidget(self.thresholdLabel,7,0)
         gridLayout.addLayout(self.threshLayout,7,1,1,2)
-        #gridLayout.addWidget(QtGui.QLabel('Thresholds'),6,1)
-        #gridLayout.addWidget(self.threshLow,7,1,QtCore.Qt.AlignVCenter)
-        #gridLayout.addWidget(self.threshHigh,7,2,QtCore.Qt.AlignVCenter)
+
         gridLayout.addWidget(self.hysteresisLabel,8,0)
 
         gridLayout.addWidget(self.saveAllButton,9,4,QtCore.Qt.AlignCenter)
@@ -216,6 +235,11 @@ class CannyWindow(QtGui.QWidget):
 
         self.saveAllButton.hide()
         self.showFileButton.hide()
+
+        self.threshLowLabel.hide()
+        self.threshLow.hide()
+        self.threshHighLabel.hide()
+        self.threshHigh.hide()
 
         #Set layout
         self.setLayout(gridLayout)

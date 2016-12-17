@@ -1,5 +1,6 @@
 #Remove this in the final version, not needed
 from matplotlib import pyplot as plt
+from skimage import exposure
 import math
 import numpy as np
 
@@ -71,81 +72,60 @@ def generateHistogram(image):
             else:
                 hist[val] = 1
 
+    for i in range(min(list(hist.keys())), max(list(hist.keys()))):
+        if i not in hist.keys():
+            hist[i] = 0
+
     #Return generated histogram
-    return hist
+    keys = list(hist.keys())
+    values = list(hist.values())
 
+    return keys, values
 
-#Optimal threshold calculation function, using otsu's method
-def calculateThresholds(image):
-    #Generate histogram
-    hist = generateHistogram(image)
+def cumulativeSum(arr):
+    weights = []
+    for limit in range(len(arr)):
+        weight = 0
+        if limit < len(arr):
+            for i in range(0, limit+1):
+                weight += arr[i]
+        weights.append(weight)
 
-    #Create dictionary for between class variances
-    bc_variances = {}
+    return weights
 
-    #Test all possible thresholds
-    for threshold in range(1,256):
-        #Split dictionary above/below threshold
-        below_thres,above_thres = splitDictionary(hist,threshold)
-        #Total number of pixels in image
-        total = image.shape[0] * image.shape[1]
+def otsuThreshold(image):
+    pixVal, pixNo = generateHistogram(image)
 
-        #Calculate background weight and mean
-        background_total = 0
-        background_mean_total = 0
-        for key, value in below_thres.items():
-            background_total += value
-            background_mean_total += key*value
+    #Calculate cumulative sums for weight
+    weight1 = cumulativeSum(pixNo)
+    #Equivalent of weight2 = 1 - weight1
+    weight2 = cumulativeSum(pixNo[::-1])[::-1]
 
-        if total != 0:
-            background_weight = background_total / total
-        else:
-            background_weight = 0
+    #Calculate pixNo * pixVal for all values in each
+    pixNo_times_pixVal = [pixVal[i]*pixNo[i] for i in range(len(pixNo))]
 
-        if background_total != 0:
-            background_mean = background_mean_total / background_total
-        else:
-            background_mean = 0
+    #Calculate means
+    mean1 = [cumulativeSum(pixNo_times_pixVal)[i] / weight1[i] for i in range(len(weight1))]
+    mean2 = [cumulativeSum(pixNo_times_pixVal[::-1])[i] / weight2[::-1][i] for i in range(len(weight2))][::-1]
 
-        #Calculate foreground weight and mean
-        foreground_total = 0
-        foreground_mean_total = 0
-        for key, value in above_thres.items():
-            foreground_total += value
-            foreground_mean_total += key*value
+    #Line up arrays
+    weight1 = weight1[:-1]
+    weight2 = weight2[1:]
+    mean1 = mean1[:-1]
+    mean2 = mean2[1:]
 
-        if total != 0:
-            foreground_weight = foreground_total / total
-        else:
-            foreground_weight = 0
+    #Calculate variances
+    variances = []
+    for i in range(len(weight1)):
+        variances.append(weight1[i] * weight2[i] * (mean1[i] - mean2[i])**2)
 
-        if foreground_total != 0:
-            foreground_mean = foreground_mean_total / foreground_total
-        else:
-            foreground_mean = 0
+    #Line up pixVal with variances list
+    pixVal = pixVal[:-1]
 
-        #Calculate between class variance for current threshold
-        between_class_variance = background_weight * foreground_weight * (
-                background_mean - foreground_mean)**2
-        bc_variances[threshold] = between_class_variance
+    #Find optimal threshold
+    optimalThreshold = pixVal[variances.index(max(variances))]
 
-    #Find largest value in bc_variances, and store the threshold
-    optimal_thres = max(bc_variances,key=bc_variances.get)
-    choice = str(input('Show threshold selection plot? (y/n)'))
-    if choice == 'y':
-        a=range(1,256)
-        values = [bc_variances[i] for i in range(1,256)]
-        plt.plot(a,values)
-        plt.show()
-    print('Optimal threshold: ',optimal_thres)
-    choice = str(input('Show histogram? (y/n)'))
-    if choice == 'y':
-        plt.bar(hist.keys(),hist.values(),1)
-        plt.plot((optimal_thres,optimal_thres),(0,max(hist.values())),'r-')
-        plt.show()
-
-    #Return threshold with optimal between class variance
-    return optimal_thres
+    return optimalThreshold
 
 #Thresholding function
 def threshold_image(image,low,high):
@@ -172,19 +152,20 @@ def threshold_image(image,low,high):
     #Return thresholded image
     return output, strongEdges
 
-#Interface function, to interact with main program
-def threshold(image,magnitude,suppressedImage, lowThreshRatio,  highThreshRatio):
-    #Calculate main threshold
-    #highThreshRatio = 0.275 #Ratio OF max gradient magnitude
-    #lowThreshRatio = 0.25 #Ratio OF highThreshRatio
+def threshold(image, magnitude, suppressedImage, auto=True, lowThreshRatio=None,  highThreshRatio=None):
+    if auto:
+        #Calculate automatic threshold
+        #Values are slightly manipulated since otsu generally over-estimates the threshold, these values give a better result
+        highThresh = 0.8*otsuThreshold(image)
+        lowThresh = 0.25*highThresh
+    else:
+        #NB highThreshRatio is a ratio OF max gradient magnitude
+        #NB lowThreshRatio is a ratio OF highThreshRatio
+        highThresh = highThreshRatio*np.max(magnitude)
+        lowThresh = lowThreshRatio*highThresh
 
-    #t = calculateThresholds(suppressedImage)
-    #Threshold the image using high and low threshold
-    highThresh = highThreshRatio*np.max(magnitude)
-    lowThresh = lowThreshRatio*highThresh
-
-    #Threshold that shit
+    #Threshold the image
     output, strongEdgesQueue = threshold_image(suppressedImage,lowThresh,highThresh)
 
-    #Return thresholded image
+    #Return thresholded image and queue of strong egdes
     return output, strongEdgesQueue

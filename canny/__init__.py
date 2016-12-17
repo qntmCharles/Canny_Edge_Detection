@@ -5,6 +5,7 @@ import decimal
 decimal.getcontext().prec = 15
 
 from .imageClass import Image
+from .fullCanny import fullCanny
 from .gaussian import gaussian
 from .sobel import sobel
 from .convolution import convolution

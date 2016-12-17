@@ -35,7 +35,10 @@ class WorkerThread(QtCore.QThread):
             if not self.stopFlag:
                 #Threshold
                 self.emit(QtCore.SIGNAL('updateThresholdLabel'))
-                self.parent().I.threshold_(self.parent().lowThresh, self.parent().highThresh)
+                if self.parent().thresholdAuto:
+                    self.parent().I.threshold_(True)
+                else:
+                    self.parent().I.threshold_(False, self.parent().lowThresh, self.parent().highThresh)
                 self.emit(QtCore.SIGNAL('finishThreshold'))
 
             if not self.stopFlag:
@@ -52,12 +55,11 @@ class WorkerThread(QtCore.QThread):
             print(e)
             self.running = False
 
-    def __del__(self):
-        print('this got called')
+    """def __del__(self):
         #Set stopping flag
         self.stopFlag = True
         #Wait for thread to finish processing before terminating
-        self.wait()
+        self.wait()"""
 
 class BackgroundThread(QtCore.QThread):
     '''Keeps the GUI responsive by updating the main loop'''
@@ -69,8 +71,8 @@ class BackgroundThread(QtCore.QThread):
 
     def run(self):
         '''Starts the thread doing work when inbuilt start() is called'''
-        from .guiApp import App
+        #from .guiApp import App
         #Update GUI every 0.1 seconds to prevent GUI lock
         while self.worker.running:
-            App.processEvents()
+            QtGui.QApplication.processEvents()
             time.sleep(0.1)

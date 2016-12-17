@@ -1,10 +1,3 @@
-Plan:
-1: Gaussian Blur [DONE]
-2: Sobel [DONE]
-3: Non-Maximum Suppression [DONE]
-4: Hysteresis Thresholding [DONE]
-5: GUI [DONE]
-
 TODO:
 -In write up:
 	-in HCI: gestalt principles of organisation
@@ -23,33 +16,25 @@ TODO:
 	-check timer is accurate
 	-gaussian kernel values test - before normalisation and then show that normalisation needed
 	-tests for NMS showing displayRegion, interpolated stuff etc
-	-otsu testing?? (if kept)
-	-GUI testing on separate platforms
+	-otsu testing (if kept)
+	-GUI testing on separate platforms 
+		-how tf do I make file system roots work?!
+		-might require an icon for the taskbar on windows
 
 -Evaluation
 	-GUI:
 		-A focus event when a window is opened by a button, but then disappears - to stop it being hidden by the main window
 			-(Would require threading)
 
--Documentation
+-Add CLI
 
--Thresholding:
-	-Add one more method of thresholding
-	-Add thresholding method options
-
--GUI:
-	-ask Liam about encapsulation 'n' stuff, do /Liam in gui.py
-
--Comment that shit:
+-Document, refactor, check and comment that shit:
 	-gaussian [DONE]
 	-convolution [DONE]
 	-nms
+	-imageClass
 	-main
 	-sobel
 	-hysteresis 
 	-threshold 
 	-gui
-
-Potential:
--Change gaussian kernel radius to be 6*sigma
--Investigate dynamic thresholds

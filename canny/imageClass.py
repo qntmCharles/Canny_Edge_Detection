@@ -18,29 +18,31 @@ class Image():
         self.strongEdgesQueue = Queue()
         self.thresholded = np.array([])
         self.final = np.array([])
+
     def __str__(self):
         str=''
-        if self.original != np.array([]):
+        nul = np.array([])
+        if self.original != nul:
             str += 'Original: assigned\n'
         else:
             str += 'Original: unassigned\n'
-        if self.gblur != np.array([]):
+        if self.gblur != nul:
             str += 'Gaussian blur: assigned\n'
         else:
             str += 'Gaussian blur: unassigned\n'
-        if self.smagnitude != np.array([]):
+        if self.smagnitude != nul:
             str += 'Sobel: assigned\n'
         else:
             str += 'Sobel: unassigned\n'
-        if self.suppressed != np.array([]):
+        if self.suppressed != nul:
             str += 'Suppression: assigned\n'
         else:
             str += 'Suppression: unassigned\n'
-        if self.thresholded != np.array([]):
+        if self.thresholded != nul:
             str += 'Thresholding: assigned\n'
         else:
             str += 'Thresholding: unassigned\n'
-        if self.final != np.array([]):
+        if self.final != nul:
             str += 'Final: assigned'
         else:
             str += 'Final: unassigned'
@@ -56,10 +58,12 @@ class Image():
 
     def nms_(self):
         self.suppressed = nonMaximumSuppression(self.smagnitude,self.shgradient,self.svgradient,self.sdirection)
-        #self.suppressed = nonMaximumSuppression(self.smagnitude, self.sdirection)
 
-    def threshold_(self, lowThreshold, highThreshold):
-        self.thresholded, self.strongEdgesQueue  = threshold(self.original,self.smagnitude,self.suppressed, lowThreshold, highThreshold)
+    def threshold_(self, auto, lowThreshold=None, highThreshold=None):
+        if auto:
+            self.thresholded, self.strongEdgesQueue = threshold(self.original, self.smagnitude, self.suppressed)
+        else:
+            self.thresholded, self.strongEdgesQueue  = threshold(self.original,self.smagnitude,self.suppressed, False, lowThreshold, highThreshold)
 
     def hysteresis_(self):
         self.final = hysteresis(self.thresholded, self.strongEdgesQueue)
