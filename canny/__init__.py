@@ -3,6 +3,7 @@ import numpy as np
 import math
 import decimal
 decimal.getcontext().prec = 15
+#Do I need that? ^^ Does it actually make a difference...
 
 from .imageClass import Image
 from .gaussian import gaussian

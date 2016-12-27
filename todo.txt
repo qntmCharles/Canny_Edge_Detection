@@ -27,6 +27,14 @@ TODO:
 			-(Would require threading)
 
 -Add CLI
+	-Actually... remove it? idk
+
+-Change variables that are /meant/ to be private to __foo (or should I use _foo? __foo makes it impossible, _foo just implies it's a bad idea to fiddle with it)
+	-DON'T do that, it's reserved for when things are a bad idea to be fiddled with. It's not here. Therefore, just make it clear in documentation that certain variables are theoretically private but aren't in the code since it's unnecessary. Perhaps use getters and setters? 	
+	-No, just make a note in the writeup that somet hings could be privcate, but would cause unnecessary pain and cause obfuscation and dodginess
+	-Simply acknowledge that it's a limitation of using python, and forcing encapsulation is unnecessary
+
+-Move Queue to a queueClass.py file
 
 -Document, refactor, check and comment that shit:
 	-gaussian [DONE]

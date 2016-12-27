@@ -82,13 +82,13 @@ def generateHistogram(image):
 
     return keys, values
 
-def cumulativeSum(arr):
+def cumulativeSum(array):
     weights = []
-    for limit in range(len(arr)):
+    for limit in range(len(array)):
         weight = 0
-        if limit < len(arr):
+        if limit < len(array):
             for i in range(0, limit+1):
-                weight += arr[i]
+                weight += array[i]
         weights.append(weight)
 
     return weights
