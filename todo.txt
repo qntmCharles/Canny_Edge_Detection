@@ -6,6 +6,12 @@ TODO:
 	-in analysis research section: point out that thresholding hysteresis will be split into two separate stages
 	-point out that progress bar is inferior to a timer - it is not known how much processing is needed so a progress bar is not suitable, timer lets you know it's still going
 	-data storage
+	-{
+	-Change variables that are /meant/ to be private to __foo (or should I use _foo? __foo makes it impossible, _foo just implies it's a bad idea to fiddle with it)
+		-DON'T do that, it's reserved for when things are a bad idea to be fiddled with. It's not here. Therefore, just make it clear in documentation that certain variables are theoretically private but aren't in the code since it's unnecessary. Perhaps use getters and setters? 	
+	-No, just make a note in the writeup that somet hings could be privcate, but would cause unnecessary pain and cause obfuscation and dodginess
+	-Simply acknowledge that it's a limitation of using python, and forcing encapsulation is unnecessary
+	-}
 
 -Testing:
 	-deliberately break some things then fix them
@@ -26,13 +32,6 @@ TODO:
 		-A focus event when a window is opened by a button, but then disappears - to stop it being hidden by the main window
 			-(Would require threading)
 
--Add CLI
-	-Actually... remove it? idk
-
--Change variables that are /meant/ to be private to __foo (or should I use _foo? __foo makes it impossible, _foo just implies it's a bad idea to fiddle with it)
-	-DON'T do that, it's reserved for when things are a bad idea to be fiddled with. It's not here. Therefore, just make it clear in documentation that certain variables are theoretically private but aren't in the code since it's unnecessary. Perhaps use getters and setters? 	
-	-No, just make a note in the writeup that somet hings could be privcate, but would cause unnecessary pain and cause obfuscation and dodginess
-	-Simply acknowledge that it's a limitation of using python, and forcing encapsulation is unnecessary
 
 -Move Queue to a queueClass.py file
 

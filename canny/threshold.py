@@ -152,7 +152,7 @@ def threshold_image(image,low,high):
     #Return thresholded image
     return output, strongEdges
 
-def threshold(image, magnitude, suppressedImage, auto=True, lowThreshRatio=None,  highThreshRatio=None):
+def threshold(image, magnitude, suppressedImage, True, lowThreshRatio=None,  highThreshRatio=None):
     if auto:
         #Calculate automatic threshold
         #Values are slightly manipulated since otsu generally over-estimates the threshold, these values give a better result
