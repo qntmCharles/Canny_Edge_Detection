@@ -7,8 +7,20 @@ from .hysteresis import hysteresis
 from .hysteresis import Queue
 
 class Image():
+    """
+        A class that holds all data relating to a single image that is loaded
+        into the program
+
+        NB: this class acts as a data structure, as well as holding all
+        methods that can be applied to the data
+        NB: python does not support private, public and protected attributes.
+        In the interests of encapsulation, the data should be private, however
+        enforcing this without built in support is unnecessary obfuscation,
+        so the data is treated as public and can be accessed from outside the
+        object
+    """
     def __init__(self,originalImage):
-        #Initialised all attributes with empty arrays (or empty Queue)
+        # Initialised all attributes with empty arrays (or empty Queue)
         self.original = originalImage
         self.gblur = np.array([])
         self.smagnitude = np.array([])
@@ -28,11 +40,11 @@ class Image():
         finalStr=''
         nil = np.array([])
         # List of attributes to be checked
-        toCheck = [self.original, self.gblur, self.smagnitude, self.suppressed, \
-                self.thresholded, self.final]
+        toCheck = [self.original, self.gblur, self.smagnitude, \
+                self.suppressed, self.thresholded, self.final]
         # Strings associated with said attributes (in same order)
-        associatedStrs = ['Original', 'Gaussian blur', 'Sobel', 'Suppression', \
-                'Thresholding', 'Final']
+        associatedStrs = ['Original', 'Gaussian blur', 'Sobel', \
+                'Suppression', 'Thresholding', 'Final']
 
         # Iterate through toCheck
         for i in range(len(toCheck)):
@@ -47,7 +59,9 @@ class Image():
 
     def gaussian_(self,stdev,width):
         """
-            Gaussian blur takes standard deviation, kernel width and original image
+            Gaussian blur takes standard deviation, kernel width and original
+            image
+
             Returns blurred image
         """
         self.gblur = gaussian(stdev,width,self.original)
@@ -56,14 +70,16 @@ class Image():
         """
             Sobel filter takes the blurred image
 
-            Returns gradient magnitude and direction, as well as horizontal and
-            vertical gradient components
+            Returns gradient magnitude and direction, as well as horizontal
+            and vertical gradient components (all represented as arrays)
         """
-        self.smagnitude,self.sdirection,self.shgradient,self.svgradient = sobel(self.gblur)
+        self.smagnitude,self.sdirection,self.shgradient,self.svgradient = \
+                sobel(self.gblur)
 
-        # Ensure data type of gradient magnitude & direction arrays contain floats
-        self.smagnitude = self.smagnitude.astype('float')
-        self.sdirection = self.sdirection.astype('float')
+        ##########IS this needed?
+        # Ensure gradient magnitude & direction arrays contain floats
+        #self.smagnitude = self.smagnitude.astype('float')
+        #self.sdirection = self.sdirection.astype('float')
 
     def nms_(self):
         """
@@ -71,33 +87,36 @@ class Image():
 
             Returns array of 0s and gradient magnitudes where not suppressed
         """
-        self.suppressed = nonMaximumSuppression(self.smagnitude,self.shgradient, \
-                self.svgradient,self.sdirection)
+        self.suppressed = nonMaximumSuppression(self.smagnitude, \
+                self.shgradient, self.svgradient,self.sdirection)
 
     def threshold_(self, autoBool, lowThreshold=None, highThreshold=None):
         """
             Automatic thresholding takes original image, gradient magnitude,
             and suppressed image
 
-            User defined thresholding takes original image, gradient magnitude,
-            suppressed image and low & high threshold ratios
+            User defined thresholding takes original image, gradient
+            magnitude, suppressed image and low & high threshold ratios
 
-            Returns thresholded image containing 0s (no edge), 128s (edge candidate),
-            255s (strong/definite edges) and queue of strong edges
+            Returns thresholded image containing 0s (no edge), 128s
+            (edge candidate), 255s (strong/definite edges) and queue of
+            strong edges
         """
         # Automatic thresholding
         if autoBool:
-            self.thresholded, self.strongEdgesQueue = threshold(self.original, \
-                    self.smagnitude, self.suppressed, True)
+            self.thresholded, self.strongEdgesQueue = thresholdInterface(\
+                    self.original, self.smagnitude, self.suppressed, True)
 
         # User defined thresholds
         else:
-            self.thresholded, self.strongEdgesQueue  = threshold(self.original, \
-                    self.smagnitude,self.suppressed, False, lowThreshold, highThreshold)
+            self.thresholded, self.strongEdgesQueue  = thresholdInterface(\
+                    self.original, self.smagnitude,self.suppressed, False, \
+                    lowThresholdRatio, highThresholdRatio)
 
     def hysteresis_(self):
         """
-            Hysteresis algorithm takes thresholded image and strong edges queue
+            Hysteresis algorithm takes thresholded image and strong
+            edges queue
 
             Returns final image containing only strong edges
         """

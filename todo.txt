@@ -32,16 +32,26 @@ TODO:
 		-A focus event when a window is opened by a button, but then disappears - to stop it being hidden by the main window
 			-(Would require threading)
 
+	-NMS/sobel: could've put the gradient mag, magH, magV and direction into a single structure, as a vector. 
+		Would be much nicer. 
 
--Move Queue to a queueClass.py file
+To ask Liam:
+	-Is the declaration in imageClass suitable to avoid the stupidity of total encapsulation
+	-Should generating an index in NMS be it's own function
+	-Is commenting ALL of NMS and convolution necessary? It's literally the same over and over
+	-Do assertions count as exception handling
+
+-Code:
+	-Move Queue to a queueClass.py file
+	-Add assertions/error checks
 
 -Document, refactor, check and comment that shit:
-	-gaussian [DONE]
-	-convolution [DONE]
-	-nms
-	-imageClass
+	-gaussian [ADD ASSERTIONS]
+	-convolution [ADD ASSERTIONS]
+	-nms [NEEDS TO BE CHECKED AND ADD ASSERTIONS]
+	-imageClass [ADD ASSERTIONS]
 	-main
-	-sobel
+	-sobel [NEEDS TO BE CHECKED AND ADD ASSERTIONS]
 	-hysteresis 
-	-threshold 
+	-threshold [NEEDS TO BE CHECKED AND ADD ASSERTIONS]
 	-gui

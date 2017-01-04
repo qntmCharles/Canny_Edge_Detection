@@ -1,41 +1,11 @@
 from .nms import checkExists
+from .queueClass import Queue
 import numpy as np
 import math, sys
 
-class Queue():
-    """Implementation of a queue (FIFO) data structure."""
-    def __init__(self):
-        #Initialise elements of queue
-        self.elements=[]
-
-    def __str__(self):
-        #Initialise empty string
-        string = ''
-
-        #Convert each element into a co-ordinate representation
-        for i in range(self.pointer,len(self.elements)+1):#test this
-            element = elements[i]
-            string += '('+str(element[0])+','+str(element[1])+'), '
-
-        #Return the generated string
-        return string
-
-    def enqueue(self,val):
-        #Add the new value to the queue
-        self.elements.append(val)
-
-    def dequeue(self):
-        #Get the first element of the queue
-        return self.elements.pop(0)
-
-    def isEmpty(self):
-        #If the length of the elements list is 0, it's empty
-        if len(self.elements) == 0:
-            return True
-        else:
-            return False
-
 def findConnectedEdges(mag, y, x):
+    """
+
     for i in range(-2,3):
         for j in range(-2,3):
             if checkExists((y+i, x+j),mag.shape):

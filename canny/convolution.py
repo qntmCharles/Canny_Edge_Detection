@@ -2,14 +2,24 @@ import math
 import numpy as np
 
 def convolution(I,k):
+    """
+        Function for 2-D convolution of two arrays
+
+        NB: local variable I is the image being convolved
+        NB: local variable k is the kernel
+        NB: 'edge', here, refers to the edge of the image, not the edges
+            being detected
+        NB: uses 'extend' method for edge handling: extend image values beyond
+            edge
+    """
+
     #Check if kernel is symmetrical
     if k.shape[0] != k.shape[1]:
         print('Kernel must be symmetric.')
 
-    #Use 'extend' method for edge handling: extend values beyond edge
-    #NB 'edge' here means edge of image, not the edges that are being detected
     #Create array of zeros with the same size as image
     r = np.zeros(I.shape)
+
     #Calculate no. pixels to not need edge handling (kernel radius)
     pad = int(math.floor(k.shape[0]/2))
 
