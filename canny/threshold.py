@@ -14,7 +14,7 @@ def splitDictionary(dictionary,threshold):
 
     # Check that the keys are all integers
     for key in dictionary.keys():
-        assert type(key) is in [IntType, StrType], \
+        assert isinstance(key,int) or isinstance(key,str), \
                 'Dictionary keys contain non-integer'
 
     # Initialise dictionaries
@@ -40,6 +40,7 @@ def generateHistogram(image):
 
         NB: keys are the items that have been identified in the image,
         values are the counts for each item
+
         NB: function converts all numbers in the array to the largest
         integer less than or equal
     """
@@ -53,7 +54,7 @@ def generateHistogram(image):
             val = math.floor(image[i][j])
 
             # Check value is now an integer
-            assert type(val) is IntType, 'Non-integer key'
+            assert isinstance(val, int), 'Non-integer key'
 
             # If value not already in histogram, add it
             if val in hist:
@@ -62,6 +63,7 @@ def generateHistogram(image):
             # Otherwise, increment the count for this key
             else:
                 hist[val] = 1
+
 
     # This checks that the keys of the histogram form a full interval,
     # i.e. any missing values between the min and max key values are entered
@@ -114,9 +116,9 @@ def otsuThreshold(image):
     pixNoTimesPixVal = [pixVal[i]*pixNo[i] for i in range(len(pixNo))]
 
     #Calculate means
-    mean1 = [cumulativeSum(pixNo_times_pixVal)[i] / weight1[i] for i in \
+    mean1 = [cumulativeSum(pixNoTimesPixVal)[i] / weight1[i] for i in \
             range(len(weight1))]
-    mean2 = [cumulativeSum(pixNo_times_pixVal[::-1])[i] / weight2[::-1][i] \
+    mean2 = [cumulativeSum(pixNoTimesPixVal[::-1])[i] / weight2[::-1][i] \
             for i in range(len(weight2))][::-1]
 
     # Line up arrays (the last value of weight1 & mean1 is not needed, thus
@@ -141,7 +143,13 @@ def otsuThreshold(image):
 
 def thresholdImage(image,low,high):
     """
-        Function to threshold an array given a low and high threshold
+        Function to threshold an array given a low and high threshold,
+        returning the thresholded image as an array
+
+        NB: the choice of 255 for a strong edge, 128 for a candidate and 0 for
+        no edge is arbitrary. It is simply for easy testing, since 255 and 128
+        are noticeably different and 0 is simply black (it should also be
+        noted, however, that in the final image a strong edge *should* be 255)
     """
     # Initialise output array
     output = np.zeros(image.shape)
@@ -171,9 +179,15 @@ def thresholdInterface(image, magnitude, suppressedImage, auto, \
         lowThreshRatio=None, highThreshRatio=None):
     """
         Function that acts as an interface between the thresholding algorithm
-        and the rest of the program
+        and the rest of the program, takes image, gradient magnitude and
+        suppressed image array, as well as a boolean to indicate whether otsu
+        thresholding will be used. If necessary, also takes a low and high
+        threshold ratio
+
+        Returns the thresholded image as an array
 
         NB highThreshRatio is a ratio OF max gradient magnitude
+
         NB lowThreshRatio is a ratio OF highThreshRatio
     """
     #If automatic thresholding

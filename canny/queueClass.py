@@ -6,6 +6,7 @@ class Queue():
 
         NB: no rear pointer is needed since there is no limit on memory
         (technically, there is, but the Queue will never reach that size)
+
         NB: no front pointer is needed since python handles this itself -
         when the first element is removed, the next element is now the front
         of the queue automatically
@@ -16,17 +17,16 @@ class Queue():
         self.elements = []
 
     def __str__(self):
-        # Initialise output string
-        string = ''
+        # Initialise output sString
+        outputString = ''
 
         # Convert each element into a co-ordinate representation and
-        # append to string
+        # append to outputString
         for i in range(self.pointer,len(self.elements)+1):#test this
             element = elements[i]
-            string += '('+str(element[0])+','+str(element[1])+'), '
+            outputString += '('+str(element[0])+','+str(element[1])+'), '
 
-        # Return the generated string
-        return string
+        return outputString
 
     def enqueue(self,val):
         # Add the new value to the queue

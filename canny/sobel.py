@@ -42,5 +42,5 @@ def sobel(image):
     # Normalise gradient so that the image isn't darkened
     normalisedGradient = 255.0*np.absolute(gradient)/np.max(gradient)
 
-    return normalised_gradient, direction, horizontal, vertical
+    return normalisedGradient, direction, horizontal, vertical
 

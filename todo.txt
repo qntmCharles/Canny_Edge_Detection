@@ -26,7 +26,7 @@ TODO:
 	-GUI testing on separate platforms 
 		-how tf do I make file system roots work?!
 		-might require an icon for the taskbar on windows
-
+	-When testing is done, remove hysteresis and change newHysteresis to hysteresis
 -Evaluation
 	-GUI:
 		-A focus event when a window is opened by a button, but then disappears - to stop it being hidden by the main window
@@ -36,22 +36,32 @@ TODO:
 		Would be much nicer. 
 
 To ask Liam:
-	-Is the declaration in imageClass suitable to avoid the stupidity of total encapsulation
-	-Should generating an index in NMS be it's own function
-	-Is commenting ALL of NMS and convolution necessary? It's literally the same over and over
-	-Do assertions count as exception handling
+	-Do assertions count as exception handling: just do inputs
+	-Comments: specify which are repeated
 
 -Code:
-	-Move Queue to a queueClass.py file
 	-Add assertions/error checks
+	-Change main function names from x to xInterface
+	-Change main window to be canny window? Would make more sense...
+	-Add exception handling/check inputs for loading an image
+	-Move imageClass to gui (it's really meant to be used by the gui)
+	-Create a 'canny' function that will simply do all of canny
 
 -Document, refactor, check and comment that shit:
 	-gaussian [ADD ASSERTIONS]
 	-convolution [ADD ASSERTIONS]
-	-nms [NEEDS TO BE CHECKED AND ADD ASSERTIONS]
+	-nms [CHECK AND ADD ASSERTIONS]
 	-imageClass [ADD ASSERTIONS]
 	-main
-	-sobel [NEEDS TO BE CHECKED AND ADD ASSERTIONS]
-	-hysteresis 
-	-threshold [NEEDS TO BE CHECKED AND ADD ASSERTIONS]
+	-sobel [CHECK AND ADD ASSERTIONS]
+	-hysteresis  [CHECK AND ADD ASSERTIONS AND REMOVE HYSTERESIS]
+	-threshold [CHECK AND ADD ASSERTIONS]
+	-__init__
 	-gui
+		-guiApp [CHECK]
+		-guiCanny [REARRANGE METHODS]
+		-guiMpl (check if figcanvas init can be moved to the beginning of __init__, or use super) [CHECK]
+		-guiSaveDialog
+		-guiSobelDialog
+		-guiThreads [CHECK]
+		-__init__

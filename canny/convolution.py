@@ -6,11 +6,17 @@ def convolution(I,k):
         Function for 2-D convolution of two arrays
 
         NB: local variable I is the image being convolved
+
         NB: local variable k is the kernel
+
         NB: 'edge', here, refers to the edge of the image, not the edges
             being detected
+
         NB: uses 'extend' method for edge handling: extend image values beyond
             edge
+
+        NB: python does not have arrays, only lists of lists. Where I refer to
+        an array, I am referring to a numpy array
     """
 
     #Check if kernel is symmetrical

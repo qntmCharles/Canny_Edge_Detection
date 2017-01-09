@@ -9,7 +9,7 @@ from .imageClass import Image
 from .gaussian import gaussian
 from .sobel import sobel
 from .convolution import convolution
-from .threshold import threshold
+from .threshold import thresholdInterface
 from .hysteresis import hysteresis
 
 print('canny initialised')

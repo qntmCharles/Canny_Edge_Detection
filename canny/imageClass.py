@@ -2,7 +2,7 @@ import numpy as np
 from .gaussian import gaussian
 from .sobel import sobel
 from .nms import nonMaximumSuppression
-from .threshold import threshold
+from .threshold import thresholdInterface
 from .hysteresis import hysteresis
 from .hysteresis import Queue
 
@@ -13,9 +13,10 @@ class Image():
 
         NB: this class acts as a data structure, as well as holding all
         methods that can be applied to the data
+
         NB: python does not support private, public and protected attributes.
         In the interests of encapsulation, the data should be private, however
-        enforcing this without built in support is unnecessary obfuscation,
+        enforcing this without built in support is unnecessarily obfuscated,
         so the data is treated as public and can be accessed from outside the
         object
     """
