@@ -435,14 +435,14 @@ class CannyWindow(QtGui.QWidget):
         """
             Function that handles the GUI when the working thread has
             finished e.g. resetting the timer, dealing with button visibility
+
+            NB: there is no need to tell the background thread to stop since
+            it will automatically stop when the worker is no longer running
         """
         # Stop timer and remove connections
         self.guiTimer.stop()
         self.guiTimer.timeout.disconnect(self.updateStrings)
         self.guiTimer.timeout.disconnect(self.updateTimer)
-
-        # Tell the background thread to stop
-        self.update.stop()
 
         # Reset the thread label
         self.threadLabel.activated=False
@@ -605,45 +605,66 @@ class CannyWindow(QtGui.QWidget):
         """
             Function to open a file and load it into the program
         """
-        #Open file dialog and get selected filepath
-        filepath = QtGui.QFileDialog.getOpenFileName(self, 'Open file', '~', 'Image files (*.jpg *.gif *.bmp *.png)')
+        # Open file dialog and get selected filepath
+        filepath = QtGui.QFileDialog.getOpenFileName(self, 'Open file', '~', \
+                'Image files (*.jpg *.gif *.bmp *.png)')
+
+        # If the dialog returns an filepath (it may not if it is cancelled)
         if filepath:
-            #Store loaded image in Image object
+            # Store loaded image in Image object
             self.I = Image(np.asarray(im.open(filepath).convert('L'),dtype=np.float))
-            #Set file status
+
+            # Set file status
             self.fileStatusLabel.setText('File: '+str(filepath.split('/')[-1]))
 
-            #Show 'show file' button
+            # Show 'show file' button
             self.showFileButton.show()
 
     def startFunctionCheck(self):
-        #Check if no image has been loaded
+        """
+            Function to ensure that there is an image loaded into the program
+            before starting the processing
+        """
+        # Check if no image has been loaded
         if self.I is None:
-            #Show error message
+            # Show error message
             self.errorMessage('No Image Loaded')
+
         else:
-            #Continue
+            # Start function if there is an image
             self.startFunction()
 
     def updateStrings(self):
+        """
+            Function to animate any labels with an activation flag
+        """
+        # If the flag is activated, then update the dots
         if self.gblurLabel.activated:
             self.gblurLabel.setText('Gaussian Blur: processing'+self.dotDotDot())
+
         if self.sobelLabel.activated:
             self.sobelLabel.setText('Sobel Filter: processing'+self.dotDotDot())
+
         if self.nmsLabel.activated:
             self.nmsLabel.setText('Non Maximum Suppression: processing'+self.dotDotDot())
+
         if self.thresholdLabel.activated:
             self.thresholdLabel.setText('Thresholding: processing'+self.dotDotDot())
+
         if self.hysteresisLabel.activated:
             self.hysteresisLabel.setText('Hysteresis: processing'+self.dotDotDot())
+
         if self.threadLabel.activated:
             self.threadLabel.setText('Waiting for thread termination'+self.dotDotDot())
 
     def startFunction(self):
-        #Ensure no data from previous processes
+        """
+            Function that starts the processing
+        """
+        # Ensure no data from previous processes
         self.resetFunc()
 
-        #Timer
+        # Start timer and connect to required functions
         self.seconds = 0
         self.minutes = 0
         self.timerLabel.setText('00:00')
@@ -651,15 +672,15 @@ class CannyWindow(QtGui.QWidget):
         self.guiTimer.timeout.connect(self.updateStrings)
         self.guiTimer.start(1000)
 
-        #Define threads
+        # Create the threads for actual processing & for background updating
         self.worker = WorkerThread(self)
         self.update = BackgroundThread(self.worker, self)
 
-        #Show/hide necessary buttons
+        # Show/hide necessary buttons
         self.cancelButton.show()
         self.startButton.hide()
 
-        #Define custom signals
+        # Define custom signals for communicating with the working thread
         errorException = QtCore.pyqtSignal()
         updateGaussianLabel = QtCore.pyqtSignal()
         finishGaussian = QtCore.pyqtSignal()
@@ -672,37 +693,74 @@ class CannyWindow(QtGui.QWidget):
         updateHysteresisLabel = QtCore.pyqtSignal()
         finishHysteresis = QtCore.pyqtSignal()
 
-        #Connect signals
+        # Connect signals
+        # Connect signal for an error message from the thread
         QtCore.QObject.connect(self.worker, QtCore.SIGNAL('errorException'), \
                 self.errorMessage)
 
-        self.gblurUpdateConnection = lambda: self.updateFromThreadFunc(self.gblurLabel, 'Gaussian Blur: processing.')
-        QtCore.QObject.connect(self.worker, QtCore.SIGNAL('updateGaussianLabel'), self.gblurUpdateConnection)
-        self.gblurFinishConnection = lambda: self.finishFromThreadFunc(self.gblurLabel, 'Gaussian Blur: complete', self.gblurSave, self.gblurShow)
-        QtCore.QObject.connect(self.worker, QtCore.SIGNAL('finishGaussian'), self.gblurFinishConnection)
+        # Create a lambda function that updates the relevant labels once
+        # the processing is started
+        self.gblurUpdateConnection = lambda: self.updateFromThreadFunc(\
+                self.gblurLabel, 'Gaussian Blur: processing.')
 
-        self.sobelUpdateConnection = lambda: self.updateFromThreadFunc(self.sobelLabel, 'Sobel Filter: processing.')
-        QtCore.QObject.connect(self.worker, QtCore.SIGNAL('updateSobelLabel'), self.sobelUpdateConnection)
-        self.sobelFinishConnection = lambda: self.finishFromThreadFunc(self.sobelLabel, 'Sobel Filter: complete', self.sobelSave, self.sobelShow)
-        QtCore.QObject.connect(self.worker, QtCore.SIGNAL('finishSobel'), self.sobelFinishConnection)
+        # Connect to said function
+        QtCore.QObject.connect(self.worker, QtCore.SIGNAL(\
+                'updateGaussianLabel'), self.gblurUpdateConnection)
 
-        self.nmsUpdateConnection = lambda: self.updateFromThreadFunc(self.nmsLabel, 'Non Maximum Suppression: processing.')
-        QtCore.QObject.connect(self.worker, QtCore.SIGNAL('updateNmsLabel'), self.nmsUpdateConnection)
-        self.nmsFinishConnection = lambda: self.finishFromThreadFunc(self.nmsLabel, 'Non Maximum Suppression: complete', self.nmsSave, self.nmsShow)
-        QtCore.QObject.connect(self.worker, QtCore.SIGNAL('finishNms'), self.nmsFinishConnection)
+        # Create a lambda for updating the relevant labels once finished
+        self.gblurFinishConnection = lambda: self.finishFromThreadFunc(\
+                self.gblurLabel, 'Gaussian Blur: complete', self.gblurSave,\
+                self.gblurShow)
 
-        self.threshUpdateConnection = lambda: self.updateFromThreadFunc(self.thresholdLabel, 'Thresholding: processing.')
-        QtCore.QObject.connect(self.worker, QtCore.SIGNAL('updateThresholdLabel'), self.threshUpdateConnection)
-        self.threshFinishConnection = lambda: self.finishFromThreadFunc(self.thresholdLabel, 'Thresholding: complete', self.thresholdSave, self.thresholdShow)
-        QtCore.QObject.connect(self.worker, QtCore.SIGNAL('finishThreshold'), self.threshFinishConnection)
+        # Connect to said function
+        QtCore.QObject.connect(self.worker, QtCore.SIGNAL('finishGaussian'), \
+                self.gblurFinishConnection)
 
-        self.hystUpdateConnection = lambda: self.updateFromThreadFunc(self.hysteresisLabel, 'Hysteresis: processing.')
-        QtCore.QObject.connect(self.worker, QtCore.SIGNAL('updateHysteresisLabel'), self.hystUpdateConnection)
-        self.hystFinishConnection = lambda: self.finishFromThreadFunc(self.hysteresisLabel, 'Hysteresis: complete', self.hysteresisSave, self.hysteresisShow, True)
-        QtCore.QObject.connect(self.worker, QtCore.SIGNAL('finishHysteresis'), self.hystFinishConnection)
+        #NB: this is repeated for the following 4 blocks of code
 
+        self.sobelUpdateConnection = lambda: self.updateFromThreadFunc(\
+                self.sobelLabel, 'Sobel Filter: processing.')
+        QtCore.QObject.connect(self.worker, QtCore.SIGNAL(\
+                'updateSobelLabel'), self.sobelUpdateConnection)
+        self.sobelFinishConnection = lambda: self.finishFromThreadFunc(\
+                self.sobelLabel, 'Sobel Filter: complete', self.sobelSave, \
+                self.sobelShow)
+        QtCore.QObject.connect(self.worker, QtCore.SIGNAL('finishSobel'), \
+                self.sobelFinishConnection)
+
+        self.nmsUpdateConnection = lambda: self.updateFromThreadFunc(\
+                self.nmsLabel, 'Non Maximum Suppression: processing.')
+        QtCore.QObject.connect(self.worker, QtCore.SIGNAL('updateNmsLabel'), \
+                self.nmsUpdateConnection)
+        self.nmsFinishConnection = lambda: self.finishFromThreadFunc(\
+                self.nmsLabel, 'Non Maximum Suppression: complete', \
+                self.nmsSave, self.nmsShow)
+        QtCore.QObject.connect(self.worker, QtCore.SIGNAL('finishNms'), \
+                self.nmsFinishConnection)
+
+        self.threshUpdateConnection = lambda: self.updateFromThreadFunc(\
+                self.thresholdLabel, 'Thresholding: processing.')
+        QtCore.QObject.connect(self.worker, QtCore.SIGNAL(\
+                'updateThresholdLabel'), self.threshUpdateConnection)
+        self.threshFinishConnection = lambda: self.finishFromThreadFunc(\
+                self.thresholdLabel, 'Thresholding: complete', \
+                self.thresholdSave, self.thresholdShow)
+        QtCore.QObject.connect(self.worker, QtCore.SIGNAL('finishThreshold'),\
+                self.threshFinishConnection)
+
+        self.hystUpdateConnection = lambda: self.updateFromThreadFunc(\
+                self.hysteresisLabel, 'Hysteresis: processing.')
+        QtCore.QObject.connect(self.worker, QtCore.SIGNAL(\
+                'updateHysteresisLabel'), self.hystUpdateConnection)
+        self.hystFinishConnection = lambda: self.finishFromThreadFunc(\
+                self.hysteresisLabel, 'Hysteresis: complete', \
+                self.hysteresisSave, self.hysteresisShow, True)
+        QtCore.QObject.connect(self.worker, QtCore.SIGNAL(\
+                'finishHysteresis'), self.hystFinishConnection)
+
+        # Connect function for finishing the thread
         self.worker.finished.connect(self.finishedThreadFunc)
 
-        #Start threads
+        # Start threads
         self.worker.start()
         self.update.start()
