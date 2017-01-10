@@ -298,365 +298,6 @@ class CannyWindow(QtGui.QWidget):
         # Set layout to window
         self.setLayout(gridLayout)
 
-    def handleThresholdOptions(self, option, Flag=None):
-        """
-            Function for handling the threshold parameters visibility - when
-            manual is selected, the input boxes must be shown, when no longer
-            selected, must be hidden
-        """
-        # Check that option is either 'manual' or 'auto'
-        assert option in ['manual', 'auto'], 'Function handleThresholdOptions\
-                : option entered was not a known value'
-
-        if option == 'manual':
-            self.threshHighLabel.show()
-            self.threshHigh.show()
-            self.threshLowLabel.show()
-            self.threshLow.show()
-        else:
-            self.thresholdAuto = not self.thresholdAuto
-            self.threshHighLabel.hide()
-            self.threshHigh.hide()
-            self.threshLowLabel.hide()
-            self.threshLow.hide()
-
-    def updateThresholds(self, threshold, text):
-        """
-            Function to update value of high and low threshold ratios when
-            text is entered into the associated input boxes
-        """
-        # Check if the text holds a float
-        errorFlag = False
-        try:
-            # Check if it contains a float by trying to convert to float
-            text = float(text)
-
-        except ValueError:
-            # If it fails, set errorFlag to False
-            errorFlag = True
-
-        # If there is no error
-        if not errorFlag:
-            # Check that the ratios are between 0 and 1
-            if (text >= 1) or (text <= 0):
-                self.errorMessage('Threshold ratios must be a number \
-                        between 0 and 1')
-
-            # Set the relevant threshold ratio
-            if threshold == 'low':
-                self.lowThreshRatio = text
-            else:
-                self.highThreshRatio = text
-        else:
-            # If it fails, raise an error message
-            self.errorMessage('Threshold ratios must be a number between \
-                    0 and 1')
-
-    def resetFunc(self):
-        """
-            Function to reset the program if processing has been cancelled
-        """
-        # Hide the save all button
-        self.saveAllButton.hide()
-
-        # Hide show & save buttons
-        for i in range(0,2):
-            for j in range(0,5):
-                self.widgets[i][j].hide()
-
-        # Reinitialise the image object with the original
-        self.I.__init__(self.I.original)
-
-        # Reset timer
-        self.timerLabel.setText('00:00')
-
-        # Hide reset button
-        self.resetButton.hide()
-
-    def terminateThread(self):
-        """
-            Function to terminate the working thread when the cancel button
-            is pressed
-
-            NB: terminating a thread cannot be done forcefully - the thread
-            must finish what it is doing. Hence the aim here is to disconnect
-            any reference to the thread, tell it to stop and not move to the
-            next stage of the algorithm, and wait for it to finish on it's own
-        """
-        # If the worker thread exists
-        if self.worker:
-            # Tell worker to stop running
-            self.worker.stopFlag = True
-
-            # Disconnect all connections with worker so that functions do not
-            # communicate with it
-            self.worker.finished.disconnect(self.finishedThreadFunc)
-            QtCore.QObject.disconnect(self.worker, QtCore.SIGNAL('updateGaussianLabel'), self.gblurUpdateConnection)
-            QtCore.QObject.disconnect(self.worker, QtCore.SIGNAL('finishGaussian'), self.gblurFinishConnection)
-            QtCore.QObject.disconnect(self.worker, QtCore.SIGNAL('updateSobelLabel'), self.sobelUpdateConnection)
-            QtCore.QObject.disconnect(self.worker, QtCore.SIGNAL('finishSobel'), self.sobelFinishConnection)
-            QtCore.QObject.disconnect(self.worker, QtCore.SIGNAL('updateNmsLabel'), self.nmsUpdateConnection)
-            QtCore.QObject.disconnect(self.worker, QtCore.SIGNAL('finishNms'), self.nmsFinishConnection)
-            QtCore.QObject.disconnect(self.worker, QtCore.SIGNAL('updateThresholdLabel'), self.threshUpdateConnection)
-            QtCore.QObject.disconnect(self.worker, QtCore.SIGNAL('finishThreshold'), self.threshFinishConnection)
-            QtCore.QObject.disconnect(self.worker, QtCore.SIGNAL('updateHysteresisLabel'), self.hystUpdateConnection)
-            QtCore.QObject.disconnect(self.worker, QtCore.SIGNAL('finishHysteresis'), self.hystFinishConnection)
-
-            # Remove reference to current worker
-            self.worker = None
-
-            # Set activation flags to false
-            self.gblurLabel.activated = False
-            self.sobelLabel.activated = False
-            self.nmsLabel.activated = False
-            self.thresholdLabel.activated = False
-            self.hysteresisLabel.activated = False
-
-            # Reset stage flags
-            self.gblurLabel.setText('Gaussian Blur: not started')
-            self.sobelLabel.setText('Sobel Filter: not started')
-            self.nmsLabel.setText('Non Maximum Suppression: not started')
-            self.thresholdLabel.setText('Thresholding: not started')
-            self.hysteresisLabel.setText('Hysteresis: not started')
-
-            # Stop the timer and reset
-            self.guiTimer.stop()
-            self.timerLabel.setText('00:00')
-
-            # Call the function that handles the GUI when the thread has
-            # finished
-            self.finishedThreadFunc()
-
-        # If the worker thread doesn't exist, raise an error message
-        else:
-            self.errorMessage('Thread does not exist')
-
-    def finishedThreadFunc(self):
-        """
-            Function that handles the GUI when the working thread has
-            finished e.g. resetting the timer, dealing with button visibility
-
-            NB: there is no need to tell the background thread to stop since
-            it will automatically stop when the worker is no longer running
-        """
-        # Stop timer and remove connections
-        self.guiTimer.stop()
-        self.guiTimer.timeout.disconnect(self.updateStrings)
-        self.guiTimer.timeout.disconnect(self.updateTimer)
-
-        # Reset the thread label
-        self.threadLabel.activated=False
-        self.threadLabel.setText('')
-
-        # Hide and show the relevant buttons
-        self.startButton.show()
-        self.cancelButton.hide()
-        self.resetButton.show()
-        self.cancelButton.setEnabled(True)
-        self.cancelButton.setWindowOpacity(1)
-
-    def saveAllFunc(self):
-        """
-            Function to call the dialog for saving all images
-        """
-        # Call the dialog
-        saveDialog = SaveAllDialog(self)
-
-        # Set window focus to the save all dialog
-        saveDialog.setFocus()
-
-        # Start the event loop of the dialog
-        saveDialog.exec_()
-
-    def dotDotDot(self):
-        """
-            Function to animate the '...' on labels
-        """
-        # Create list of dots
-        strList = ['.','..','...']
-
-        # Return a different dot based on the number of seconds
-        return strList[self.seconds % 3]
-
-    def showFunc(self, image, colourmap):
-        """
-            Function to show a given image using a given colourmap
-        """
-        try:
-            # Call the matplotlib window
-            showImage = mplWindow(image, colourmap)
-            # Set focus to the mpl window
-            showImage.setFocus()
-            # Start event loop for the mpl window
-            showImage.exec_()
-
-        except Exception as error:
-            # If an exception occurs during the display of the image,
-            # stop the program from crashing and display error
-            exceptionMessage = type(error).__name__+': '+str(error)
-            self.errorMessage(exceptionMessage)
-
-    def saveFunc(self, image):
-        """
-            Function to save a given image
-        """
-        # Get the filepath to save the image to
-        filepath = QtGui.QFileDialog.getSaveFileName(self, 'Save file', '~', \
-                'Image files (*.jpg *.gif *.bmp *.png)')
-
-        # If the file dialog returned a filepath
-        if filepath:
-            try:
-                # Try to save the image
-                im.fromarray(image.astype(np.uint8)).save(filepath)
-
-            except Exception as error:
-                # If an error occurs, display the error
-                exceptionMessage = type(error).__name__+': '+str(error)
-                self.errorMessage(exceptionMessage)
-
-    def sobelOptionsFunc(self, dialogType):
-        """
-            Function to call the dialog to handle the various options for
-            saving/showing images from the sobel filter algorithm
-        """
-        # Call the dialog
-        dialog = SobelOptionsDialog(self, dialogType)
-
-        # Set focus to the sobel dialog
-        dialog.setFocus()
-
-        # Start event loop of the sobel dialog
-        dialog.exec_()
-
-    def updateTimer(self):
-        """
-            Function to update the timer
-        """
-        # Increment the number of seconds
-        self.seconds += 1
-
-        # If the number of seconds is 60, reset to 0 and increment minutes
-        if self.seconds == 60:
-            self.seconds=0
-            self.minutes += 1
-
-        # Format the strings
-        minutesString = "{0:02d}".format(self.minutes)
-        secondsString = "{0:02d}".format(self.seconds)
-
-        # Set timer label text
-        self.timerLabel.setText(minutesString+':'+secondsString)
-
-    def errorMessage(self, message):
-        """
-            Function to display an error dialog with a given message
-        """
-        # Create a dialog, set text and buttons
-        errorMsg = QtGui.QMessageBox()
-        errorMsg.setIcon(QtGui.QMessageBox.Warning)
-        errorMsg.setText(message)
-        errorMsg.setStandardButtons(QtGui.QMessageBox.Ok)
-        errorMsg.setDefaultButton(QtGui.QMessageBox.Ok)
-        errorMsg.setEscapeButton(QtGui.QMessageBox.Ok)
-
-        # Set focus to the dialog
-        errorMsg.setFocus()
-
-        # Start event loop of dialog
-        errorMsg.exec_()
-
-    def updateFromThreadFunc(self, label, labelText):
-        """
-            Function to update a given label with given text
-        """
-        # Provided the worker hasn't stopped, change the label
-        if not self.worker.stopFlag:
-            # Set text of label
-            label.setText(labelText)
-
-            # Activate the label animation
-            label.activated = True
-
-    def finishFromThreadFunc(self, label, labelText, saveButton, \
-            showButton, flag=False):
-        """
-            Function to handle the end of a stage:
-            stop animating a label, set it's text, then show the show and
-            save buttons
-        """
-        # If the worker thread is still running
-        if not self.worker.stopFlag:
-            # Change label activation flag and text
-            label.activated = False
-            label.setText(labelText)
-
-            # Show show and save buttons
-            saveButton.show()
-            showButton.show()
-
-            # If a flag is given, then show the save all button. This is done
-            # here so that an extra function purely for this button is not
-            # needed
-            if flag:
-                self.saveAllButton.show()
-
-    def openFileFunc(self):
-        """
-            Function to open a file and load it into the program
-        """
-        # Open file dialog and get selected filepath
-        filepath = QtGui.QFileDialog.getOpenFileName(self, 'Open file', '~', \
-                'Image files (*.jpg *.gif *.bmp *.png)')
-
-        # If the dialog returns an filepath (it may not if it is cancelled)
-        if filepath:
-            # Store loaded image in Image object
-            self.I = Image(np.asarray(im.open(filepath).convert('L'),dtype=np.float))
-
-            # Set file status
-            self.fileStatusLabel.setText('File: '+str(filepath.split('/')[-1]))
-
-            # Show 'show file' button
-            self.showFileButton.show()
-
-    def startFunctionCheck(self):
-        """
-            Function to ensure that there is an image loaded into the program
-            before starting the processing
-        """
-        # Check if no image has been loaded
-        if self.I is None:
-            # Show error message
-            self.errorMessage('No Image Loaded')
-
-        else:
-            # Start function if there is an image
-            self.startFunction()
-
-    def updateStrings(self):
-        """
-            Function to animate any labels with an activation flag
-        """
-        # If the flag is activated, then update the dots
-        if self.gblurLabel.activated:
-            self.gblurLabel.setText('Gaussian Blur: processing'+self.dotDotDot())
-
-        if self.sobelLabel.activated:
-            self.sobelLabel.setText('Sobel Filter: processing'+self.dotDotDot())
-
-        if self.nmsLabel.activated:
-            self.nmsLabel.setText('Non Maximum Suppression: processing'+self.dotDotDot())
-
-        if self.thresholdLabel.activated:
-            self.thresholdLabel.setText('Thresholding: processing'+self.dotDotDot())
-
-        if self.hysteresisLabel.activated:
-            self.hysteresisLabel.setText('Hysteresis: processing'+self.dotDotDot())
-
-        if self.threadLabel.activated:
-            self.threadLabel.setText('Waiting for thread termination'+self.dotDotDot())
-
     def startFunction(self):
         """
             Function that starts the processing
@@ -764,3 +405,385 @@ class CannyWindow(QtGui.QWidget):
         # Start threads
         self.worker.start()
         self.update.start()
+
+    def startFunctionCheck(self):
+        """
+            Function to ensure that there is an image loaded into the program
+            before starting the processing
+        """
+        # Check if no image has been loaded
+        if self.I is None:
+            # Show error message
+            self.errorMessage('No Image Loaded')
+
+        else:
+            # Start function if there is an image
+            self.startFunction()
+
+    def updateFromThreadFunc(self, label, labelText):
+        """
+            Function to update a given label with given text
+        """
+        # Provided the worker hasn't stopped, change the label
+        if not self.worker.stopFlag:
+            # Set text of label
+            label.setText(labelText)
+
+            # Activate the label animation
+            label.activated = True
+
+    def finishFromThreadFunc(self, label, labelText, saveButton, \
+            showButton, flag=False):
+        """
+            Function to handle the end of a stage:
+            stop animating a label, set it's text, then show the show and
+            save buttons
+        """
+        # If the worker thread is still running
+        if not self.worker.stopFlag:
+            # Change label activation flag and text
+            label.activated = False
+            label.setText(labelText)
+
+            # Show show and save buttons
+            saveButton.show()
+            showButton.show()
+
+            # If a flag is given, then show the save all button. This is done
+            # here so that an extra function purely for this button is not
+            # needed
+            if flag:
+                self.saveAllButton.show()
+
+    def updateStrings(self):
+        """
+            Function to animate any labels with an activation flag
+        """
+        # If the flag is activated, then update the dots
+        if self.gblurLabel.activated:
+            self.gblurLabel.setText('Gaussian Blur: processing'+\
+                    self.dotDotDot())
+
+        if self.sobelLabel.activated:
+            self.sobelLabel.setText('Sobel Filter: processing'+\
+                    self.dotDotDot())
+
+        if self.nmsLabel.activated:
+            self.nmsLabel.setText('Non Maximum Suppression: processing'+\
+                    self.dotDotDot())
+
+        if self.thresholdLabel.activated:
+            self.thresholdLabel.setText('Thresholding: processing'+\
+                    self.dotDotDot())
+
+        if self.hysteresisLabel.activated:
+            self.hysteresisLabel.setText('Hysteresis: processing'+\
+                    self.dotDotDot())
+
+        if self.threadLabel.activated:
+            self.threadLabel.setText('Waiting for thread termination'+\
+                    self.dotDotDot())
+
+    def dotDotDot(self):
+        """
+            Function to animate the '...' on labels
+        """
+        # Create list of dots
+        strList = ['.','..','...']
+
+        # Return a different dot based on the number of seconds
+        return strList[self.seconds % 3]
+
+    def updateTimer(self):
+        """
+            Function to update the timer
+        """
+        # Increment the number of seconds
+        self.seconds += 1
+
+        # If the number of seconds is 60, reset to 0 and increment minutes
+        if self.seconds == 60:
+            self.seconds=0
+            self.minutes += 1
+
+        # Format the strings
+        minutesString = "{0:02d}".format(self.minutes)
+        secondsString = "{0:02d}".format(self.seconds)
+
+        # Set timer label text
+        self.timerLabel.setText(minutesString+':'+secondsString)
+
+    def openFileFunc(self):
+        """
+            Function to open a file and load it into the program
+
+            NB: excepting handling is not needed here - the only images that
+            the user can load can be handled by the program, it is not
+            possible to load anything other than (*.jpg *.gif *.bmp *.png)
+        """
+        # Open file dialog and get selected filepath
+        filepath = QtGui.QFileDialog.getOpenFileName(self, 'Open file', '~', \
+                'Image files (*.jpg *.gif *.bmp *.png)')
+
+        # If the dialog returns an filepath (it may not if it is cancelled)
+        if filepath:
+            # Store loaded image in Image object
+            self.I = Image(np.asarray(im.open(filepath).convert('L'),\
+                dtype=np.float))
+
+            # Set file status
+            self.fileStatusLabel.setText('File: '+str(filepath.split('/')\
+                    [-1]))
+
+            # Show 'show file' button
+            self.showFileButton.show()
+
+    def showFunc(self, image, colourmap):
+        """
+            Function to show a given image using a given colourmap
+        """
+        try:
+            # Call the matplotlib window
+            showImage = mplWindow(image, colourmap)
+            # Set focus to the mpl window
+            showImage.setFocus()
+            # Start event loop for the mpl window
+            showImage.exec_()
+
+        except Exception as error:
+            # If an exception occurs during the display of the image,
+            # stop the program from crashing and display error
+            exceptionMessage = type(error).__name__+': '+str(error)
+            self.errorMessage(exceptionMessage)
+
+    def saveFunc(self, image):
+        """
+            Function to save a given image
+        """
+        # Get the filepath to save the image to
+        filepath = QtGui.QFileDialog.getSaveFileName(self, 'Save file', '~', \
+                'Image files (*.jpg *.gif *.bmp *.png)')
+
+        # If the file dialog returned a filepath
+        if filepath:
+            try:
+                # Try to save the image
+                im.fromarray(image.astype(np.uint8)).save(filepath)
+
+            except Exception as error:
+                # If an error occurs, display the error
+                exceptionMessage = type(error).__name__+': '+str(error)
+                self.errorMessage(exceptionMessage)
+
+    def sobelOptionsFunc(self, dialogType):
+        """
+            Function to call the dialog to handle the various options for
+            saving/showing images from the sobel filter algorithm
+        """
+        # Call the dialog
+        dialog = SobelOptionsDialog(self, dialogType)
+
+        # Set focus to the sobel dialog
+        dialog.setFocus()
+
+        # Start event loop of the sobel dialog
+        dialog.exec_()
+
+    def handleThresholdOptions(self, option, Flag=None):
+        """
+            Function for handling the threshold parameters visibility - when
+            manual is selected, the input boxes must be shown, when no longer
+            selected, must be hidden
+        """
+        # Check that option is either 'manual' or 'auto'
+        assert option in ['manual', 'auto'], 'Function handleThresholdOptions\
+                : option entered was not a known value'
+
+        if option == 'manual':
+            self.threshHighLabel.show()
+            self.threshHigh.show()
+            self.threshLowLabel.show()
+            self.threshLow.show()
+        else:
+            self.thresholdAuto = not self.thresholdAuto
+            self.threshHighLabel.hide()
+            self.threshHigh.hide()
+            self.threshLowLabel.hide()
+            self.threshLow.hide()
+
+    def updateThresholds(self, threshold, text):
+        """
+            Function to update value of high and low threshold ratios when
+            text is entered into the associated input boxes
+        """
+        # Check if the text holds a float
+        errorFlag = False
+        try:
+            # Check if it contains a float by trying to convert to float
+            text = float(text)
+
+        except ValueError:
+            # If it fails, set errorFlag to False
+            errorFlag = True
+
+        # If there is no error
+        if not errorFlag:
+            # Check that the ratios are between 0 and 1
+            if (text >= 1) or (text <= 0):
+                self.errorMessage('Threshold ratios must be a number \
+                        between 0 and 1')
+
+            # Set the relevant threshold ratio
+            if threshold == 'low':
+                self.lowThreshRatio = text
+            else:
+                self.highThreshRatio = text
+        else:
+            # If it fails, raise an error message
+            self.errorMessage('Threshold ratios must be a number between \
+                    0 and 1')
+
+    def errorMessage(self, message):
+        """
+            Function to display an error dialog with a given message
+        """
+        # Create a dialog, set text and buttons
+        errorMsg = QtGui.QMessageBox()
+        errorMsg.setIcon(QtGui.QMessageBox.Warning)
+        errorMsg.setText(message)
+        errorMsg.setStandardButtons(QtGui.QMessageBox.Ok)
+        errorMsg.setDefaultButton(QtGui.QMessageBox.Ok)
+        errorMsg.setEscapeButton(QtGui.QMessageBox.Ok)
+
+        # Set focus to the dialog
+        errorMsg.setFocus()
+
+        # Start event loop of dialog
+        errorMsg.exec_()
+
+
+    def saveAllFunc(self):
+        """
+            Function to call the dialog for saving all images
+        """
+        # Call the dialog
+        saveDialog = SaveAllDialog(self)
+
+        # Set window focus to the save all dialog
+        saveDialog.setFocus()
+
+        # Start the event loop of the dialog
+        saveDialog.exec_()
+
+    def terminateThread(self):
+        """
+            Function to terminate the working thread when the cancel button
+            is pressed
+
+            NB: terminating a thread cannot be done forcefully - the thread
+            must finish what it is doing. Hence the aim here is to disconnect
+            any reference to the thread, tell it to stop and not move to the
+            next stage of the algorithm, and wait for it to finish on it's own
+        """
+        # If the worker thread exists
+        if self.worker:
+            # Tell worker to stop running
+            self.worker.stopFlag = True
+
+            # Disconnect all connections with worker so that functions do not
+            # communicate with it
+            self.worker.finished.disconnect(self.finishedThreadFunc)
+            QtCore.QObject.disconnect(self.worker, QtCore.SIGNAL(\
+                    'updateGaussianLabel'), self.gblurUpdateConnection)
+            QtCore.QObject.disconnect(self.worker, QtCore.SIGNAL(\
+                    'finishGaussian'), self.gblurFinishConnection)
+            QtCore.QObject.disconnect(self.worker, QtCore.SIGNAL(\
+                    'updateSobelLabel'), self.sobelUpdateConnection)
+            QtCore.QObject.disconnect(self.worker, QtCore.SIGNAL(\
+                    'finishSobel'), self.sobelFinishConnection)
+            QtCore.QObject.disconnect(self.worker, QtCore.SIGNAL(\
+                    'updateNmsLabel'), self.nmsUpdateConnection)
+            QtCore.QObject.disconnect(self.worker, QtCore.SIGNAL(\
+                    'finishNms'), self.nmsFinishConnection)
+            QtCore.QObject.disconnect(self.worker, QtCore.SIGNAL(\
+                    'updateThresholdLabel'), self.threshUpdateConnection)
+            QtCore.QObject.disconnect(self.worker, QtCore.SIGNAL(\
+                    'finishThreshold'), self.threshFinishConnection)
+            QtCore.QObject.disconnect(self.worker, QtCore.SIGNAL(\
+                    'updateHysteresisLabel'), self.hystUpdateConnection)
+            QtCore.QObject.disconnect(self.worker, QtCore.SIGNAL(\
+                    'finishHysteresis'), self.hystFinishConnection)
+
+            # Remove reference to current worker
+            self.worker = None
+
+            # Set activation flags to false
+            self.gblurLabel.activated = False
+            self.sobelLabel.activated = False
+            self.nmsLabel.activated = False
+            self.thresholdLabel.activated = False
+            self.hysteresisLabel.activated = False
+
+            # Reset stage flags
+            self.gblurLabel.setText('Gaussian Blur: not started')
+            self.sobelLabel.setText('Sobel Filter: not started')
+            self.nmsLabel.setText('Non Maximum Suppression: not started')
+            self.thresholdLabel.setText('Thresholding: not started')
+            self.hysteresisLabel.setText('Hysteresis: not started')
+
+            # Stop the timer and reset
+            self.guiTimer.stop()
+            self.timerLabel.setText('00:00')
+
+            # Call the function that handles the GUI when the thread has
+            # finished
+            self.finishedThreadFunc()
+
+        # If the worker thread doesn't exist, raise an error message
+        else:
+            self.errorMessage('Thread does not exist')
+
+    def finishedThreadFunc(self):
+        """
+            Function that handles the GUI when the working thread has
+            finished e.g. resetting the timer, dealing with button visibility
+
+            NB: there is no need to tell the background thread to stop since
+            it will automatically stop when the worker is no longer running
+        """
+        # Stop timer and remove connections
+        self.guiTimer.stop()
+        self.guiTimer.timeout.disconnect(self.updateStrings)
+        self.guiTimer.timeout.disconnect(self.updateTimer)
+
+        # Reset the thread label
+        self.threadLabel.activated=False
+        self.threadLabel.setText('')
+
+        # Hide and show the relevant buttons
+        self.startButton.show()
+        self.cancelButton.hide()
+        self.resetButton.show()
+        self.cancelButton.setEnabled(True)
+        self.cancelButton.setWindowOpacity(1)
+
+    def resetFunc(self):
+        """
+            Function to reset the program if processing has been cancelled
+        """
+        # Hide the save all button
+        self.saveAllButton.hide()
+
+        # Hide show & save buttons
+        for i in range(0,2):
+            for j in range(0,5):
+                self.widgets[i][j].hide()
+
+        # Reinitialise the image object with the original
+        self.I.__init__(self.I.original)
+
+        # Reset timer
+        self.timerLabel.setText('00:00')
+
+        # Hide reset button
+        self.resetButton.hide()

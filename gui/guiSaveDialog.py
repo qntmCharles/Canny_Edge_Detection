@@ -143,6 +143,20 @@ class SaveAllDialog(QtGui.QDialog):
         # Set layout to window
         self.setLayout(formLayout)
 
+    def setFileExt(self, text):
+        """
+            Function that sets the file extension, called when the line edit
+            is edited
+        """
+        self.fileExt = text
+
+    def updateFilename(self, key, text):
+        """
+            Function that updates the given filename (key) with the given
+            contents of the line edit (text)
+        """
+        self.filenames[key] = text
+
     def openFileFunc(self):
         """
             Function to open a file dialog and set the filepath
@@ -225,17 +239,3 @@ class SaveAllDialog(QtGui.QDialog):
             Function that kills the dialog
         """
         self.close()
-
-    def updateFilename(self, key, text):
-        """
-            Function that updates the given filename (key) with the given
-            contents of the line edit (text)
-        """
-        self.filenames[key] = text
-
-    def setFileExt(self, text):
-        """
-            Function that sets the file extension, called when the line edit
-            is edited
-        """
-        self.fileExt = text

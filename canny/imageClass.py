@@ -1,5 +1,5 @@
 import numpy as np
-from .gaussian import gaussian
+from .gaussian import gaussianInterface
 from .sobel import sobel
 from .nms import nonMaximumSuppression
 from .threshold import thresholdInterface
@@ -58,6 +58,14 @@ class Image():
 
         return finalStr
 
+    def fullCanny(self, stdev, width, autoBool, lowThreshold=None, highThreshold=None)
+        self.gaussian_(stdev, width)
+        self.sobel_()
+        self.nms_()
+        self.threshold_(autoBool, lowThreshold, highThreshold)
+        self.hysteresis_()
+        print('Full canny complete!')
+
     def gaussian_(self,stdev,width):
         """
             Gaussian blur takes standard deviation, kernel width and original
@@ -65,7 +73,7 @@ class Image():
 
             Returns blurred image
         """
-        self.gblur = gaussian(stdev,width,self.original)
+        self.gblur = gaussianInterface(stdev,width,self.original)
 
     def sobel_(self):
         """

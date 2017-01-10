@@ -37,16 +37,8 @@ TODO:
 		Would be much nicer. 
 
 To ask Liam:
-	-Do assertions count as exception handling: just do inputs
-	-Comments: specify which are repeated
-
--Code:
-	-Add assertions/error checks
-	-Change main function names from x to xInterface
-	-Change main window to be canny window? Would make more sense...
-	-Add exception handling/check inputs for loading an image
-	-Move imageClass to gui (it's really meant to be used by the gui)
-	-Create a 'canny' function that will simply do all of canny
+	-Do I need to add more exception handling?
+	-Replace numpy functions
 
 -Document, refactor, check and comment that shit:
 	-gaussian [ADD ASSERTIONS]
@@ -59,10 +51,10 @@ To ask Liam:
 	-threshold [CHECK AND ADD ASSERTIONS]
 	-__init__
 	-gui
-		-guiApp [CHECK]
-		-guiCanny [CHECK AND REARRANGE METHODS]
-		-guiMpl (check if figcanvas init can be moved to the beginning of __init__, or use super) [CHECK]
-		-guiSaveDialog [CHECK AND REARRANAGE METHODS]
-		-guiSobelDialog [CHECK AND REARRANGE METHODS]
-		-guiThreads [CHECK]
+		-guiApp
+		-guiCanny
+		-guiMpl
+		-guiSaveDialog
+		-guiSobelDialog
+		-guiThreads
 		-__init__

@@ -18,10 +18,8 @@ def convolution(I,k):
         NB: python does not have arrays, only lists of lists. Where I refer to
         an array, I am referring to a numpy array
     """
-
     #Check if kernel is symmetrical
-    if k.shape[0] != k.shape[1]:
-        print('Kernel must be symmetric.')
+    assert k.shape[0] == k.shape[1], 'kernel must be symmetrical'
 
     #Create array of zeros with the same size as image
     r = np.zeros(I.shape)

@@ -113,6 +113,3 @@ def oldHysteresis(image, strongEdges):
 
     #Return final output array
     return output
-
-
-

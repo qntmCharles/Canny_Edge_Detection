@@ -13,14 +13,14 @@ class mplCanvas(FigCanvas):
         most functionality is in FigCanvas)
     """
     def __init__(self, parent, data, colourmap):
+        # Initialise super class
+        FigCanvas.__init__(self,fig)
+
         # Initialise figure with set size
         fig = Figure(figsize=(8,6))
 
         # Initialise subplot
         self.axes = fig.add_subplot(111)
-
-        # Initialise super class
-        FigCanvas.__init__(self,fig)
 
         # Set parent of class
         self.setParent(parent)

@@ -190,6 +190,21 @@ def thresholdInterface(image, magnitude, suppressedImage, auto, \
 
         NB lowThreshRatio is a ratio OF highThreshRatio
     """
+    #Check low and high threshold ratios are floats between 0 and 1
+    if lowThreshRatio != None:
+        assert isinstance(lowThreshRatio, float), 'threshold ratio must \
+                be a float'
+
+        assert (lowThreshRatio >= 0) and (lowThreshRatio <= 1), 'threshold \
+                must be between 0 and 1 inclusive'
+
+    if highThreshRatio != None:
+        assert isinstance(highThreshRatio, float), 'threshold ratio \
+                must be a float'
+
+        assert (highThreshRatio >= 0) and (highThreshRatio <= 1), 'threshold \
+                must be between 0 and 1 inclusive'
+
     #If automatic thresholding
     if auto:
         highThresh = 0.8*otsuThreshold(image)

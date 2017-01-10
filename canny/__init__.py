@@ -6,7 +6,7 @@ decimal.getcontext().prec = 15
 #Do I need that? ^^ Does it actually make a difference...
 
 from .imageClass import Image
-from .gaussian import gaussian
+from .gaussian import gaussianInterface
 from .sobel import sobel
 from .convolution import convolution
 from .threshold import thresholdInterface

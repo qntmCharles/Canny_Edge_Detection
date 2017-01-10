@@ -38,7 +38,6 @@ def sobel(image):
                 else:
                     direction[y][x] = -math.pi/2
 
-    ######uhhh, I think the np.absoslute isn't needed, the values are all > 0
     # Normalise gradient so that the image isn't darkened
     normalisedGradient = 255.0*np.absolute(gradient)/np.max(gradient)
 
