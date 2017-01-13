@@ -2,7 +2,7 @@ import math
 import numpy as np
 from .queueClass import Queue
 
-#Function to split a single dictionary into two, given a threshold
+# Remove this once testing is complete
 def splitDictionary(dictionary,threshold):
     """
         Function to split a single dictionary 'dictionary' into two given
@@ -33,7 +33,6 @@ def splitDictionary(dictionary,threshold):
 
     return lowDict, highDict
 
-#Function to generate a histogram from a given image array
 def generateHistogram(image):
     """
         Function to generate a histogram from a given array 'image'

@@ -58,7 +58,7 @@ class Image():
 
         return finalStr
 
-    def fullCanny(self, stdev, width, autoBool, lowThreshold=None, highThreshold=None)
+    def fullCanny(self, stdev, width, autoBool, lowThreshold=None, highThreshold=None):
         self.gaussian_(stdev, width)
         self.sobel_()
         self.nms_()
