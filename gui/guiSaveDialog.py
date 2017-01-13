@@ -35,7 +35,7 @@ class SaveAllDialog(QtGui.QDialog):
 
         # Create tick boxes and input boxes (line edits) with default names
         self.gblurOption = QtGui.QCheckBox('Gaussian Blur')
-        self.gblurName = QtGui.QLineEdit(self.filnames['gblur'])
+        self.gblurName = QtGui.QLineEdit(self.filenames['gblur'])
 
         self.sobelMagOption = QtGui.QCheckBox('Sobel Gradient Magnitude')
         self.sobelMagName = QtGui.QLineEdit(self.filenames['smag'])

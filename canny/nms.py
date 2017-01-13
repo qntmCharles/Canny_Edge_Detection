@@ -27,7 +27,7 @@ def interpolate(hVector,vVector,x1,x2):
         NB: interpolation is performed assuming hVector and vVector are
         positive, that is, the interpolation is in the first quadrant, with
         x1 and x2 forming the side of a triangle parallel to the y-axis,
-        with the angle at the origin being equal to arctan(vVector/hVector)
+        with the angle at the origin being equal to arctanvVector/hVector)
         NB: x1 is assumed to be geometrically 'lower' than x2, i.e. on the
         x-axis
     """
@@ -48,9 +48,13 @@ def interpolate(hVector,vVector,x1,x2):
     # outside of the range (x1,x2) - this can occur due to floating point
     # errors
     if (result > max(x1,x2)) and not (math.isclose(max(x1,x2),result)):
+        print(x1, x2, result)
         print('Error: interpolated point greater than original points.')
+
     elif (result < min(x1,x2)) and not (math.isclose(min(x1,x2),result)):
+        print(x1,x2, result)
         print('Error: interpolated point less than original points.')
+
     # If it is not one of the above cases, the resulting point is okay and the
     # result may be returned
     else:
@@ -68,6 +72,7 @@ def displayRegion(y,x,mag):
     """
     # Initialise a list with 3 nested lists to contain the region
     region = [[],[],[]]
+
     # Get dimensions of magnitude array
     shape = mag.shape()
 
@@ -312,10 +317,15 @@ def nonMaximumSuppression(mag,magH,magV,direction):
             else:
                 print('Error: unclassified angle ('+str(angle)+')')
 
+            # If either of the gradient magnitudes is None (i.e has had an
+            # error) then give benefit of the doubt and set as candidate
+            if (gradient1 is None) or (gradient2 is None):
+                output[y][x] = mag[y][x]
+
             # If the gradient magnitude of the current pixel is larger than
             # both interpolated gradient magnitudes, it is a maximum, and
             # thus it's pixel value is kept
-            if (mag[y][x] > gradient1) and (mag[y][x] > gradient2):
+            elif (mag[y][x] > gradient1) and (mag[y][x] > gradient2):
                output[y][x] = mag[y][x]
 
             #Otherwise, the output for this pixel is 0

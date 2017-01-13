@@ -49,7 +49,7 @@ class Image():
 
         # Iterate through toCheck
         for i in range(len(toCheck)):
-            if toCheck[i] != nul:
+            if toCheck[i] != nil:
                 # If array isn't empty, it has been processed
                 finalStr += associatedStrs[i]+': complete\n'
             else:
@@ -99,7 +99,8 @@ class Image():
         self.suppressed = nonMaximumSuppression(self.smagnitude, \
                 self.shgradient, self.svgradient,self.sdirection)
 
-    def threshold_(self, autoBool, lowThreshold=None, highThreshold=None):
+    def threshold_(self, autoBool, lowThresholdRatio=None, \
+            highThresholdRatio=None):
         """
             Automatic thresholding takes original image, gradient magnitude,
             and suppressed image

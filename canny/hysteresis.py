@@ -3,14 +3,14 @@ from .queueClass import Queue
 import numpy as np
 import math, sys
 
-def findConnectedEdges(mag, y, x):
+def findConnectedEdges(array, y, x):
     """
         Function that searches a 5x5 area focused on a single point in the
-        image before recursively calling the function for other points that
+        iarraye before recursively calling the function for other points that
         contain an edge, taking the gradient magnitude array and the point
         coordinates
 
-        Returns the updated gradient magnitude array
+        Returns the updated array
 
         NB: this is depth-first connectivity searching (is that the fancy name?
 
@@ -24,15 +24,15 @@ def findConnectedEdges(mag, y, x):
         for j in range(-2,3):
 
             # If the current point exists and is an edge candidate
-            if checkExists((y+i, x+j),mag.shape) and (mag[y+i][x+j] == 128):
+            if checkExists((y+i, x+j),array.shape) and (array[y+i][x+j] == 128):
 
                 # Update the point to a strong edge
-                mag[y+i][x+j] = 255
+                array[y+i][x+j] = 255
 
                 # Recursively call the function for this point
-                mag = findConnectedEdges(mag, y+i, x+j)
+                array = findConnectedEdges(array, y+i, x+j)
 
-    return mag
+    return array
 
 def hysteresis(image, strongEdges):
     """
@@ -45,6 +45,9 @@ def hysteresis(image, strongEdges):
         considered an edge, thus recursion could happen as far as all pixels,
         thus a new recursion limit must be set
     """
+    # Prevent original image from being edited
+    image = np.copy(image)
+
     # Set recursion limit
     sys.setrecursionlimit(image.shape[0]*image.shape[1])
 

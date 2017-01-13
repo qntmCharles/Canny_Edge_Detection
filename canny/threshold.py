@@ -168,6 +168,7 @@ def thresholdImage(image,low,high):
             # If below the low threshold, the output pixel gets 0
             elif image[i][j] < low:
                 output[i][j] = 0
+
             # Otherwise, the output pixel gets 128
             else:
                 output[i][j] = 128

@@ -21,7 +21,7 @@ def generateKernel(sigma, width):
         Returns a gaussian blur kernel of the specified width as an array
     """
     # Check that kernel width is odd
-    assert width % 1 == 1, 'kernel width must be an odd integer'
+    assert width % 2 == 1, 'kernel width must be an odd integer'
 
     # Calculate radius of kernel
     radius = int((width-1)/2)

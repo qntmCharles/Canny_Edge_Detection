@@ -82,7 +82,8 @@ class WorkerThread(QtCore.QThread):
                 # If manual thresholds entered
                 else:
                     self.parent().I.threshold_(False, \
-                            self.parent().lowThresh, self.parent().highThresh)
+                            self.parent().lowThreshRatio, self.parent().\
+                            highThreshRatio)
 
                 self.emit(QtCore.SIGNAL('finishThreshold'))
 
@@ -95,8 +96,8 @@ class WorkerThread(QtCore.QThread):
 
                 self.emit(QtCore.SIGNAL('finishHysteresis'))
 
-                # Stop thread if all functions have been completed successfully
-                self.running = False
+            # Stop thread if all functions have been completed successfully
+            self.running = False
 
         # If there is an exception, display error message, then stop thread
         except Exception as error:

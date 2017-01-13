@@ -1,5 +1,7 @@
 from PyQt4 import QtCore, QtGui
 
+import numpy as np
+
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavBar
 from matplotlib.figure import Figure
@@ -13,11 +15,11 @@ class mplCanvas(FigCanvas):
         most functionality is in FigCanvas)
     """
     def __init__(self, parent, data, colourmap):
-        # Initialise super class
-        FigCanvas.__init__(self,fig)
-
         # Initialise figure with set size
         fig = Figure(figsize=(8,6))
+
+        # Initialise super class
+        FigCanvas.__init__(self,fig)
 
         # Initialise subplot
         self.axes = fig.add_subplot(111)
@@ -26,7 +28,7 @@ class mplCanvas(FigCanvas):
         self.setParent(parent)
 
         # Create image
-        image = self.axes.imshow(data, cmap=colourmap)
+        image = self.axes.imshow(data, cmap=colourmap, interpolation="none")
 
         # Add colourbar
         fig.colorbar(image)

@@ -629,9 +629,12 @@ class CannyWindow(QtGui.QWidget):
         # If there is no error
         if not errorFlag:
             # Check that the ratios are between 0 and 1
-            if (text >= 1) or (text <= 0):
-                self.errorMessage('Threshold ratios must be a number \
-                        between 0 and 1')
+            if (text > 1) or (text < 0):
+                self.errorMessage(\
+                        'Threshold ratios must be a number between 0 and 1')
+                self.threshHigh.setText
+                self.threshLow.setText(str(self.lowThreshRatio))
+                self.threshHigh.setText(str(self.highThreshRatio))
 
             # Set the relevant threshold ratio
             if threshold == 'low':
@@ -640,8 +643,10 @@ class CannyWindow(QtGui.QWidget):
                 self.highThreshRatio = text
         else:
             # If it fails, raise an error message
-            self.errorMessage('Threshold ratios must be a number between \
-                    0 and 1')
+            self.errorMessage(\
+                    'Threshold ratios must be a number between 0 and 1')
+            self.threshLow.setText(str(self.lowThreshRatio))
+            self.threshHigh.setText(str(self.highThreshRatio))
 
     def errorMessage(self, message):
         """
