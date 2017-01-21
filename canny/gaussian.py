@@ -8,8 +8,8 @@ def calculateValue(x, y, sigma):
         distribution formula for point (x,y)
     """
     # Check that x and y are integers
-    assert type(x) is int, 'x must be an integer'
-    assert type(y) is int, 'y must be an integer'
+    assert isinstance(x, int), 'x must be an integer'
+    assert isinstance(y, int), 'y must be an integer'
 
     return (1/(2*math.pi*(sigma**2)))*(math.e**(-(x**2 + y**2)/(2*sigma**2)))
 

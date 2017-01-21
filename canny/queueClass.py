@@ -1,8 +1,7 @@
-from types import *
-
 class Queue():
     """
-        Implementation of a queue (FIFO) data structure
+        Implementation of a queue (FIFO) data structure to be used
+        specifically for storing co-ordinates.
 
         NB: no rear pointer is needed since there is no limit on memory
         (technically, there is, but the Queue will never reach that size)

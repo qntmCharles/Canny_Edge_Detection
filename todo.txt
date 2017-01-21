@@ -1,17 +1,7 @@
 TODO:
--In write up:
-	-in HCI: gestalt principles of organisation
-	-in design: data flow table!
-	-in design: update /everything/
-	-in analysis research section: point out that thresholding hysteresis will be split into two separate stages
-	-point out that progress bar is inferior to a timer - it is not known how much processing is needed so a progress bar is not suitable, timer lets you know it's still going
-	-data storage
-	-{
-	-Change variables that are /meant/ to be private to __foo (or should I use _foo? __foo makes it impossible, _foo just implies it's a bad idea to fiddle with it)
-		-DON'T do that, it's reserved for when things are a bad idea to be fiddled with. It's not here. Therefore, just make it clear in documentation that certain variables are theoretically private but aren't in the code since it's unnecessary. Perhaps use getters and setters? 	
-	-No, just make a note in the writeup that somet hings could be privcate, but would cause unnecessary pain and cause obfuscation and dodginess
-	-Simply acknowledge that it's a limitation of using python, and forcing encapsulation is unnecessary
-	-}
+
+-Write up:
+	-Fix references to figures - (all/some) are incorrect
 
 -Testing:
 	-deliberately break some things then fix them
@@ -24,10 +14,13 @@ TODO:
 	-tests for NMS showing displayRegion, interpolated stuff etc
 	-otsu testing
 	-test save all dialog (have different options saved in different formats with diff names)
+	"""
 	-GUI testing on separate platforms 
 		-how tf do I make file system roots work?!
 		-might require an icon for the taskbar on windows
-	-When testing is done, remove hysteresis and change newHysteresis to hysteresis
+	"""
+	-When testing is done, remove oldHysteresis
+
 -Evaluation
 	-GUI:
 		-A focus event when a window is opened by a button, but then disappears - to stop it being hidden by the main window
@@ -36,25 +29,11 @@ TODO:
 	-NMS/sobel: could've put the gradient mag, magH, magV and direction into a single structure, as a vector. 
 		Would be much nicer. 
 
+	-Open multiple images into a queue
+
 To ask Liam:
 	-Do I need to add more exception handling?
 	-Replace numpy functions
 
--Document, refactor, check and comment that shit:
-	-gaussian [ADD ASSERTIONS]
-	-convolution [ADD ASSERTIONS]
-	-nms [CHECK AND ADD ASSERTIONS]
-	-imageClass [ADD ASSERTIONS]
-	-main
-	-sobel [CHECK AND ADD ASSERTIONS]
-	-hysteresis  [CHECK AND ADD ASSERTIONS AND REMOVE HYSTERESIS]
-	-threshold [CHECK AND ADD ASSERTIONS]
-	-__init__
-	-gui
-		-guiApp
-		-guiCanny
-		-guiMpl
-		-guiSaveDialog
-		-guiSobelDialog
-		-guiThreads
-		-__init__
+-Coding
+	-Display path to the loaded image

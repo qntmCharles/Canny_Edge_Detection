@@ -63,14 +63,6 @@ def generateHistogram(image):
             else:
                 hist[val] = 1
 
-
-    # This checks that the keys of the histogram form a full interval,
-    # i.e. any missing values between the min and max key values are entered
-    # with counts of 0
-    for i in range(min(list(hist.keys())), max(list(hist.keys()))):
-        if i not in hist.keys():
-            hist[i] = 0
-
     # Return histograms as seperate key and value lists
     keys = list(hist.keys())
     values = list(hist.values())
