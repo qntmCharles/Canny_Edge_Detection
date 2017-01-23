@@ -63,9 +63,20 @@ def generateHistogram(image):
             else:
                 hist[val] = 1
 
+    # In the interval given by the maximum and minimum pixel values, make
+    # sure there is a count for every possible pixel value (0)
+    # This creates a discrete interval
+    for i in range(min(hist.keys()),max(hist.keys())):
+            if i not in hist.keys():
+                hist[i] = 0
+
     # Return histograms as seperate key and value lists
-    keys = list(hist.keys())
-    values = list(hist.values())
+    keys = sorted(list(hist.keys()))
+
+    # Sort the values based on key
+    values = []
+    for key in keys:
+        values.append(hist[key])
 
     return keys, values
 

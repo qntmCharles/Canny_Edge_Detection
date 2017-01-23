@@ -36,13 +36,17 @@ class CannyWindow(QtGui.QWidget):
 
         # Add common key shortcuts
         # Stop processing
-        QtGui.QShortcut(QtGui.QKeySequence("Ctrl+C"), self, self.terminateThread)
+        QtGui.QShortcut(QtGui.QKeySequence("Ctrl+C"), self, \
+                self.terminateThread)
         # Open file
-        QtGui.QShortcut(QtGui.QKeySequence("Ctrl+O"), self, self.openFileFunc)
+        QtGui.QShortcut(QtGui.QKeySequence("Ctrl+O"), self, \
+                self.openFileFunc)
         # Start processing
-        QtGui.QShortcut(QtGui.QKeySequence("Ctrl+S"), self, self.startFunctionCheck)
+        QtGui.QShortcut(QtGui.QKeySequence("Ctrl+S"), self, \
+                self.startFunctionCheck)
         # Quit program
-        QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Q"), self, self.close)
+        QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Q"), self, \
+                self.close)
 
         # Set size of GUI
         self.setFixedSize(750,600)
