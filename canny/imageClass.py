@@ -1,4 +1,5 @@
 import numpy as np
+import time
 from .gaussian import gaussianInterface
 from .sobel import sobel
 from .nms import nonMaximumSuppression
@@ -20,7 +21,7 @@ class Image():
         so the data is treated as public and can be accessed from outside the
         object
     """
-    def __init__(self,originalImage):
+    def __init__(self, originalImage):
         # Initialised all attributes with empty arrays (or empty Queue)
         self.original = originalImage
         self.gblur = np.array([])
@@ -59,12 +60,22 @@ class Image():
         return finalStr
 
     def fullCanny(self, stdev, width, autoBool, lowThreshold=None, highThreshold=None):
+        newTime = time.time()
         self.gaussian_(stdev, width)
+        print('Gaussian blur complete! '+str(time.time()-newTime)+' secs')
+        newTime = time.time()
         self.sobel_()
+        print('Sobel filter complete! '+str(time.time()-newTime)+' secs')
+        newTime = time.time()
         self.nms_()
+        print('Non maximum suppression complete! '+str(time.time()-newTime)\
+                +' secs')
+        newTime = time.time()
         self.threshold_(autoBool, lowThreshold, highThreshold)
+        print('Thresholding complete! '+str(time.time()-newTime)+' secs')
+        newTime = time.time()
         self.hysteresis_()
-        print('Full canny complete!')
+        print('Full canny complete! '+str(time.time()-newTime)+' secs')
 
     def gaussian_(self,stdev,width):
         """

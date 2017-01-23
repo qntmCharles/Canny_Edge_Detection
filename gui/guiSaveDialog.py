@@ -1,4 +1,5 @@
 from PyQt4 import QtCore, QtGui
+from PIL import Image as im
 
 class SaveAllDialog(QtGui.QDialog):
     """
@@ -86,6 +87,7 @@ class SaveAllDialog(QtGui.QDialog):
         self.closeButton.clicked.connect(self.exit)
         self.dropDown.activated[str].connect(self.setFileExt)
         self.openDirButton.clicked.connect(self.openFileFunc)
+        self.saveButton.clicked.connect(self.saveFiles)
 
         # Connect line edits to a function that will change the required
         # variable
@@ -192,7 +194,7 @@ class SaveAllDialog(QtGui.QDialog):
             # For each possible file to save, check if it's been selected
             if self.gblurOption.isChecked():
                 # Get the image array
-                data = self.parent().parent().parent().I.gblur
+                data = self.parent().I.gblur
 
                 # Save the image with the chosen filepath, filename and ext
                 im.fromarray(data).convert('RGB').save(self.filepath+'/'+\
@@ -200,39 +202,62 @@ class SaveAllDialog(QtGui.QDialog):
 
             # The above process is repeated for all following loops
             if self.sobelMagOption.isChecked():
-                data = self.parent().parent().parent().I.smagnitude
+                data = self.parent().I.smagnitude
                 im.fromarray(data).convert('RGB').save(self.filepath+'/'+\
                         self.filenames['smag']+self.fileExt)
 
             if self.sobelDirOption.isChecked():
-                data = self.parent().parent().parent().I.sdirection
+                data = self.parent().I.sdirection
                 im.fromarray(data).convert('RGB').save(self.filepath+'/'+\
                         self.filenames['sdir']+self.fileExt)
 
             if self.sobelHorizOption.isChecked():
-                data = self.parent().parent().parent().I.shgradient
+                data = self.parent().I.shgradient
                 im.fromarray(data).convert('RGB').save(self.filepath+'/'+\
                         self.filenames['shoriz']+self.fileExt)
 
             if self.sobelVertOption.isChecked():
-                data = self.parent().parent().parent().I.svgradient
+                data = self.parent().I.svgradient
                 im.fromarray(data).convert('RGB').save(self.filepath+'/'+\
                         self.filenames['svert']+self.fileExt)
 
             if self.nmsOption.isChecked():
-                data = self.parent().parent().parent().I.suppressed
+                data = self.parent().I.suppressed
                 im.fromarray(data).convert('RGB').save(self.filepath+'/'+\
                         self.filenames['nms']+self.fileExt)
 
             if self.thresholdOption.isChecked():
-                data = self.parent().parent().parent().I.thresholded
+                data = self.parent().I.thresholded
                 im.fromarray(data).convert('RGB').save(self.filepath+'/'+\
                         self.filenames['thresh']+self.fileExt)
 
             if self.hysteresisOption.isChecked():
-                data = self.parent().parent().parent().I.final
+                data = self.parent().I.final
                 im.fromarray(data).convert('RGB').save(self.filepath+'/'+\
                         self.filenames['hyst']+self.fileExt)
+
+            # Display success message
+            self.successDialog()
+
+    def successDialog(self):
+        """
+            Function to display a success message to show the user that
+            saving has been complete
+        """
+        # Create a dialog, set text and buttons
+        dlg = QtGui.QMessageBox()
+        dlg.setWindowTitle('Success!')
+        dlg.setIcon(QtGui.QMessageBox.Information)
+        dlg.setText('Saving successful')
+        dlg.setStandardButtons(QtGui.QMessageBox.Ok)
+        dlg.setDefaultButton(QtGui.QMessageBox.Ok)
+        dlg.setEscapeButton(QtGui.QMessageBox.Ok)
+
+        # Set focus to the dialog
+        dlg.setFocus()
+
+        # Start event loop of dialog
+        dlg.exec_()
 
     def exit(self):
         """

@@ -2,6 +2,7 @@ TODO:
 
 -Write up:
 	-Fix references to figures - (all/some) are incorrect
+	-Add "time" module to list
 
 -Testing:
 	-deliberately break some things then fix them

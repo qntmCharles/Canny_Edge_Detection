@@ -47,12 +47,15 @@ def interpolate(hVector,vVector,x1,x2):
     # math.isclose determines if they're close, i.e. the result is only just
     # outside of the range (x1,x2) - this can occur due to floating point
     # errors
-    if (result > max(x1,x2)) and not (math.isclose(max(x1,x2),result)):
+    if (result > max(x1,x2)) and not (math.isclose(max(x1,x2),result,\
+            abs_tol=1e-09)):
         print(x1, x2, result)
         print('Error: interpolated point greater than original points.')
 
-    elif (result < min(x1,x2)) and not (math.isclose(min(x1,x2),result)):
-        print(x1,x2, result)
+    elif (result < min(x1,x2)) and not (math.isclose(min(x1,x2),result,\
+            abs_tol=1e-09)):
+        print(difference)
+        print(x1, x2, result)
         print('Error: interpolated point less than original points.')
 
     # If it is not one of the above cases, the resulting point is okay and the

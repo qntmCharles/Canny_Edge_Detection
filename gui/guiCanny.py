@@ -7,12 +7,20 @@ from .guiSobelDialog import SobelOptionsDialog
 from .guiThreads import BackgroundThread, WorkerThread
 from .guiSaveDialog import SaveAllDialog
 
+class ClickableQLabel(QtGui.QLabel):
+    def __init__(self, parent):
+        super(ClickableQLabel, self).__init__()
+
+    def mouseReleaseEvent(self, ev):
+        self.emit(QtCore.SIGNAL('clicked()'))
+
 class CannyWindow(QtGui.QWidget):
     """
         Class that acts as the main window for the program
 
         Inherits core widget functionality from QtGui.QWidget
     """
+
     def __init__(self):
         # Initialise superclass
         super(CannyWindow, self).__init__()
@@ -48,6 +56,7 @@ class CannyWindow(QtGui.QWidget):
         self.highThreshRatio = 0.25
         self.minutes = 0
         self.seconds = 0
+        self.fullFilePath = 'not loaded'
 
     def createWidgets(self):
         """
@@ -66,7 +75,7 @@ class CannyWindow(QtGui.QWidget):
         # File status label
         fileStatusFont = QtGui.QFont()
         fileStatusFont.setPointSize(15)
-        self.fileStatusLabel = QtGui.QLabel('')
+        self.fileStatusLabel = ClickableQLabel('')
         self.fileStatusLabel.setText('File: not loaded')
         self.fileStatusLabel.setFont(fileStatusFont)
 
@@ -187,6 +196,8 @@ class CannyWindow(QtGui.QWidget):
         # Lambda allows connection to a function using arguments
         self.openFileButton.clicked.connect(self.openFileFunc)
         self.startButton.clicked.connect(self.startFunctionCheck)
+        QtCore.QObject.connect(self.fileStatusLabel, \
+                QtCore.SIGNAL('clicked()'), self.showFullFilepath)
         self.showFileButton.clicked.connect(lambda: self.showFunc(\
                 self.I.original, 'gray'))
         self.threshLow.textChanged.connect(lambda: self.updateThresholds(\
@@ -228,6 +239,7 @@ class CannyWindow(QtGui.QWidget):
 
         # Add widgets to the layout
         gridLayout.addWidget(self.fileStatusLabel,0,0,QtCore.Qt.AlignLeft)
+        self.fileStatusLabel.setMaximumWidth(350)
         gridLayout.addWidget(self.showFileButton,0,3,QtCore.Qt.AlignCenter)
         gridLayout.addWidget(self.openFileButton,0,4,QtCore.Qt.AlignCenter)
         gridLayout.addWidget(self.timerLabel,1,0)
@@ -513,6 +525,25 @@ class CannyWindow(QtGui.QWidget):
         # Set timer label text
         self.timerLabel.setText(minutesString+':'+secondsString)
 
+    def showFullFilepath(self):
+        """
+            Function to display the full filepath when the label is clicked
+        """
+        # Create a dialog, set text and buttons
+        pathDialog = QtGui.QMessageBox()
+        pathDialog.setWindowTitle('Full filepath')
+        pathDialog.setIcon(QtGui.QMessageBox.Information)
+        pathDialog.setText('File: '+self.fullFilePath)
+        pathDialog.setStandardButtons(QtGui.QMessageBox.Ok)
+        pathDialog.setDefaultButton(QtGui.QMessageBox.Ok)
+        pathDialog.setEscapeButton(QtGui.QMessageBox.Ok)
+
+        # Set focus to the dialog
+        pathDialog.setFocus()
+
+        # Start event loop of dialog
+        pathDialog.exec_()
+
     def openFileFunc(self):
         """
             Function to open a file and load it into the program
@@ -522,21 +553,28 @@ class CannyWindow(QtGui.QWidget):
             possible to load anything other than (*.jpg *.gif *.bmp *.png)
         """
         # Open file dialog and get selected filepath
-        filepath = QtGui.QFileDialog.getOpenFileName(self, 'Open file', '~', \
-                'Image files (*.jpg *.gif *.bmp *.png)')
+        try:
+            filepath = QtGui.QFileDialog.getOpenFileName(self, 'Open file',\
+                    '~', 'Image files (*.jpg *.gif *.bmp *.png)')
 
-        # If the dialog returns an filepath (it may not if it is cancelled)
-        if filepath:
-            # Store loaded image in Image object
-            self.I = Image(np.asarray(im.open(filepath).convert('L'),\
-                dtype=np.float))
+            # If the dialog returns an filepath (it may not if it is cancelled)
+            if filepath:
+                # Store loaded image in Image object
+                self.I = Image(np.asarray(im.open(filepath).convert('L'),\
+                    dtype=np.float))
 
-            # Set file status
-            self.fileStatusLabel.setText('File: '+str(filepath.split('/')\
-                    [-1]))
+                # Set file status
+                self.fileStatusLabel.setText('File: '+str(filepath.split('/')\
+                        [-1]))
+                self.fullFilePath = filepath
 
-            # Show 'show file' button
-            self.showFileButton.show()
+                # Show 'show file' button
+                self.showFileButton.show()
+        except Exception as error:
+            # If an entered file does not exist, an error is thrown, so
+            # display to user.
+            exceptionMessage = type(error).__name__+': '+str(error)
+            self.errorMessage(exceptionMessage)
 
     def showFunc(self, image, colourmap):
         """
@@ -654,6 +692,7 @@ class CannyWindow(QtGui.QWidget):
         """
         # Create a dialog, set text and buttons
         errorMsg = QtGui.QMessageBox()
+        errorMsg.setWindowTitle('Error!')
         errorMsg.setIcon(QtGui.QMessageBox.Warning)
         errorMsg.setText(message)
         errorMsg.setStandardButtons(QtGui.QMessageBox.Ok)
@@ -785,7 +824,8 @@ class CannyWindow(QtGui.QWidget):
                 self.widgets[i][j].hide()
 
         # Reinitialise the image object with the original
-        self.I.__init__(self.I.original)
+        self.I = Image(np.asarray(im.open(self.fullFilePath).convert('L'),\
+                    dtype=np.float))
 
         # Reset timer
         self.timerLabel.setText('00:00')
