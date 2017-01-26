@@ -5,22 +5,12 @@ TODO:
 	-Add "time" module to list
 
 -Testing:
-	-deliberately break some things then fix them
-	-make sure the core objectives are shown to have been met
-	-use the problem with NMS (the kernels being backwards and the >=) as an example
-	-checkExists test? kinda boring...
-	-time the recursive and procedural versions of hysteresis
-	-check timer is accurate
-	-gaussian kernel values test - before normalisation and then show that normalisation needed
-	-tests for NMS showing displayRegion, interpolated stuff etc
-	-otsu testing
-	-test save all dialog (have different options saved in different formats with diff names)
-	"""
-	-GUI testing on separate platforms 
-		-how tf do I make file system roots work?!
-		-might require an icon for the taskbar on windows
-	"""
-	-When testing is done, remove oldHysteresis
+	-With the following sections, ensure there is expected, extreme and erroneous data:
+		-Image thresholding
+		-File loading (load a HUGE file)
+
+	-Time the timer
+	-use the problem with NMS (the kernels being backwards and the >=) as an example (with the simple.bmp image)
 
 -Evaluation
 	-GUI:
@@ -31,10 +21,9 @@ TODO:
 		Would be much nicer. 
 
 	-Open multiple images into a queue
+	-Better root directories for saving files
+	-Think how to deal with a vector being 0 in interpolate/nms
 
 To ask Liam:
 	-Do I need to add more exception handling?
 	-Replace numpy functions
-
--Coding
-	-Display path to the loaded image

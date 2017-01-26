@@ -224,6 +224,8 @@ class CannyWindow(QtGui.QWidget):
                 self.I.thresholded))
         self.thresholdShow.clicked.connect(lambda: self.showFunc(\
                 self.I.thresholded, 'gray'))
+        self.hysteresisSave.clicked.connect(lambda: self.saveFunc(\
+                self.I.final))
         self.hysteresisShow.clicked.connect(lambda: self.showFunc(\
                 self.I.final, 'gray'))
         self.saveAllButton.clicked.connect(self.saveAllFunc)
@@ -336,6 +338,10 @@ class CannyWindow(QtGui.QWidget):
         # Show/hide necessary buttons
         self.cancelButton.show()
         self.startButton.hide()
+
+        # Disable opening a new file
+        self.openFileButton.setEnabled(False)
+        self.openFileButton.setWindowOpacity(0.5)
 
         # Define custom signals for communicating with the working thread
         errorException = QtCore.pyqtSignal()
@@ -609,8 +615,13 @@ class CannyWindow(QtGui.QWidget):
         # If the file dialog returned a filepath
         if filepath:
             try:
+                # If not the required format, show error message
+                if filepath.split('.')[1] not in ['jpg', 'gif', 'bmp', 'png']:
+                    self.errorMessage(\
+                            "Must be saved as .jpg, .gif, .bmp or .png")
                 # Try to save the image
-                im.fromarray(image.astype(np.uint8)).save(filepath)
+                else:
+                    im.fromarray(image.astype(np.uint8)).save(filepath)
 
             except Exception as error:
                 # If an error occurs, display the error
@@ -812,8 +823,10 @@ class CannyWindow(QtGui.QWidget):
         self.startButton.show()
         self.cancelButton.hide()
         self.resetButton.show()
-        self.cancelButton.setEnabled(True)
-        self.cancelButton.setWindowOpacity(1)
+
+        # Enable open file button
+        self.openFileButton.setEnabled(True)
+        self.openFileButton.setWindowOpacity(1)
 
     def resetFunc(self):
         """

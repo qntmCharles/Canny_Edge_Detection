@@ -33,6 +33,9 @@ def interpolate(hVector,vVector,x1,x2):
     """
     # Calculate the interpolated difference, i.e. how much the interpolateed
     # value should be different from x2 or x1
+    #if math.isclose(vVector, hVector, abs_tol=1e-09):
+        #difference = abs(x2-x1)
+    #else:
     difference = (vVector/hVector)*abs(x2-x1)
 
     # If x2 is larger than x1, difference is above x1
@@ -125,7 +128,7 @@ def nonMaximumSuppression(mag,magH,magV,direction):
             # Angle = pi is a special case to avoid dividing by zero (index
             # could be 0 or 7, 7 was chosen so that
             # lowerBound < angle <= upperBound is satisfied
-            if angle == pi:
+            if (angle == pi) or (math.isclose(angle, pi, abs_tol=1e-09)):
                 index = 7
             else:
                 index=math.floor((angle+pi)/(2*pi)*8)
@@ -182,7 +185,6 @@ def nonMaximumSuppression(mag,magH,magV,direction):
                 # the interest of finding all edges
                 else:
                     gradient2 = 0
-
             elif index == 1:
                 if checkExists((y+1,x,y+1,x-1),shape):
                     pixels=(mag[y+1][x],mag[y+1][x-1])
@@ -328,8 +330,8 @@ def nonMaximumSuppression(mag,magH,magV,direction):
             # If the gradient magnitude of the current pixel is larger than
             # both interpolated gradient magnitudes, it is a maximum, and
             # thus it's pixel value is kept
-            elif (mag[y][x] > gradient1) and (mag[y][x] > gradient2):
-               output[y][x] = mag[y][x]
+            elif (mag[y][x] >= gradient1) and (mag[y][x] >= gradient2):
+                output[y][x] = mag[y][x]
 
             #Otherwise, the output for this pixel is 0
             else:

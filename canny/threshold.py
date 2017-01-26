@@ -210,7 +210,7 @@ def thresholdInterface(image, magnitude, suppressedImage, auto, \
 
     #If automatic thresholding
     if auto:
-        highThresh = 0.8*otsuThreshold(image)
+        highThresh = 0.7*otsuThreshold(image)
         lowThresh = 0.25*highThresh
 
     #Otherwise, convert low and high threshold ratios to actual thresholds
