@@ -33,10 +33,12 @@ def interpolate(hVector,vVector,x1,x2):
     """
     # Calculate the interpolated difference, i.e. how much the interpolateed
     # value should be different from x2 or x1
-    #if math.isclose(vVector, hVector, abs_tol=1e-09):
-        #difference = abs(x2-x1)
-    #else:
-    difference = (vVector/hVector)*abs(x2-x1)
+    if hVector != 0:
+        difference = (vVector/hVector)*abs(x2-x1)
+    # If the horizontal vector has no length, interpolation cannot be
+    # performed
+    else:
+        return None
 
     # If x2 is larger than x1, difference is above x1
     if x2 > x1:

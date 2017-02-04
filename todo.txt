@@ -1,29 +1,10 @@
 TODO:
 
 -Write up:
-	-Fix references to figures - (all/some) are incorrect
-	-Add "time" module to list
+	-Key technique highlight in technical solution
+	-Documentation for Technical Solution
 
--Testing:
-	-With the following sections, ensure there is expected, extreme and erroneous data:
-		-Image thresholding
-		-File loading (load a HUGE file)
-
-	-Time the timer
-	-use the problem with NMS (the kernels being backwards and the >=) as an example (with the simple.bmp image)
-
--Evaluation
-	-GUI:
-		-A focus event when a window is opened by a button, but then disappears - to stop it being hidden by the main window
-			-(Would require threading)
-
-	-NMS/sobel: could've put the gradient mag, magH, magV and direction into a single structure, as a vector. 
-		Would be much nicer. 
-
-	-Open multiple images into a queue
-	-Better root directories for saving files
-	-Think how to deal with a vector being 0 in interpolate/nms
-
-To ask Liam:
-	-Do I need to add more exception handling?
-	-Replace numpy functions
+-Evaluation:
+	-Respond to Erin's
+	-Iain
+	-Show the edge detector working on actual meteor images in the evaluation (Iain Grant)

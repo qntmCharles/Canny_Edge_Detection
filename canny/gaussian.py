@@ -11,7 +11,8 @@ def calculateValue(x, y, sigma):
     assert isinstance(x, int), 'x must be an integer'
     assert isinstance(y, int), 'y must be an integer'
 
-    return (1/(2*math.pi*(sigma**2)))*(math.e**(-(x**2 + y**2)/(2*sigma**2)))
+    return (1/math.sqrt(2*math.pi*(sigma**2)))*(\
+            math.e**(-(x**2 + y**2)/(2*sigma**2)))
 
 def generateKernel(sigma, width):
     """

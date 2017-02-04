@@ -1,6 +1,7 @@
 from PyQt4 import QtCore, QtGui
 from PIL import Image as im
 import numpy as np
+import os
 from canny.imageClass import Image
 from .guiMpl import mplWindow
 from .guiSobelDialog import SobelOptionsDialog
@@ -569,17 +570,22 @@ class CannyWindow(QtGui.QWidget):
 
             # If the dialog returns an filepath (it may not if it is cancelled)
             if filepath:
-                # Store loaded image in Image object
-                self.I = Image(np.asarray(im.open(filepath).convert('L'),\
-                    dtype=np.float))
+                # Allow files less than or equal to 10 MiB
+                if os.stat(filepath).st_size <= (10*8*1024*1024):
+                    # Store loaded image in Image object
+                    self.I = Image(np.asarray(im.open(filepath).convert('L'),\
+                        dtype=np.float))
 
-                # Set file status
-                self.fileStatusLabel.setText('File: '+str(filepath.split('/')\
-                        [-1]))
-                self.fullFilePath = filepath
+                    # Set file status
+                    self.fileStatusLabel.setText('File: '+str(filepath.split('/')\
+                            [-1]))
+                    self.fullFilePath = filepath
 
-                # Show 'show file' button
-                self.showFileButton.show()
+                    # Show 'show file' button
+                    self.showFileButton.show()
+                else:
+                    self.errorMessage('Maximum file size: 10 MiB')
+
         except Exception as error:
             # If an entered file does not exist, an error is thrown, so
             # display to user.
@@ -727,6 +733,10 @@ class CannyWindow(QtGui.QWidget):
         """
         # Call the dialog
         saveDialog = SaveAllDialog(self)
+
+        # Connect to catch exceptions
+        QtCore.QObject.connect(saveDialog, QtCore.SIGNAL('errorException'), \
+                self.errorMessage)
 
         # Set window focus to the save all dialog
         saveDialog.setFocus()

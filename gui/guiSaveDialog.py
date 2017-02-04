@@ -191,53 +191,69 @@ class SaveAllDialog(QtGui.QDialog):
 
         # If the filepath does exist
         else:
-            # For each possible file to save, check if it's been selected
-            if self.gblurOption.isChecked():
-                # Get the image array
-                data = self.parent().I.gblur
+            try:
+                saveFlag = False
+                # For each possible file to save, check if it's been selected
+                if self.gblurOption.isChecked():
+                    # Set flag to note that saving has occured
+                    saveFlag = True
 
-                # Save the image with the chosen filepath, filename and ext
-                im.fromarray(data).convert('RGB').save(self.filepath+'/'+\
-                        self.filenames['gblur']+self.fileExt)
+                    # Get the image array
+                    data = self.parent().I.gblur
 
-            # The above process is repeated for all following loops
-            if self.sobelMagOption.isChecked():
-                data = self.parent().I.smagnitude
-                im.fromarray(data).convert('RGB').save(self.filepath+'/'+\
-                        self.filenames['smag']+self.fileExt)
+                    # Save the image with the chosen filepath, filename and ext
+                    im.fromarray(data).convert('RGB').save(self.filepath+'/'+\
+                            self.filenames['gblur']+self.fileExt)
 
-            if self.sobelDirOption.isChecked():
-                data = self.parent().I.sdirection
-                im.fromarray(data).convert('RGB').save(self.filepath+'/'+\
-                        self.filenames['sdir']+self.fileExt)
+                # The above process is repeated for all following loops
+                if self.sobelMagOption.isChecked():
+                    saveFlag = True
+                    data = self.parent().I.smagnitude
+                    im.fromarray(data).convert('RGB').save(self.filepath+'/'+\
+                            self.filenames['smag']+self.fileExt)
 
-            if self.sobelHorizOption.isChecked():
-                data = self.parent().I.shgradient
-                im.fromarray(data).convert('RGB').save(self.filepath+'/'+\
-                        self.filenames['shoriz']+self.fileExt)
+                if self.sobelDirOption.isChecked():
+                    saveFlag = True
+                    data = self.parent().I.sdirection
+                    im.fromarray(data).convert('RGB').save(self.filepath+'/'+\
+                            self.filenames['sdir']+self.fileExt)
 
-            if self.sobelVertOption.isChecked():
-                data = self.parent().I.svgradient
-                im.fromarray(data).convert('RGB').save(self.filepath+'/'+\
-                        self.filenames['svert']+self.fileExt)
+                if self.sobelHorizOption.isChecked():
+                    saveFlag = True
+                    data = self.parent().I.shgradient
+                    im.fromarray(data).convert('RGB').save(self.filepath+'/'+\
+                            self.filenames['shoriz']+self.fileExt)
 
-            if self.nmsOption.isChecked():
-                data = self.parent().I.suppressed
-                im.fromarray(data).convert('RGB').save(self.filepath+'/'+\
-                        self.filenames['nms']+self.fileExt)
+                if self.sobelVertOption.isChecked():
+                    saveFlag = True
+                    data = self.parent().I.svgradient
+                    im.fromarray(data).convert('RGB').save(self.filepath+'/'+\
+                            self.filenames['svert']+self.fileExt)
 
-            if self.thresholdOption.isChecked():
-                data = self.parent().I.thresholded
-                im.fromarray(data).convert('RGB').save(self.filepath+'/'+\
-                        self.filenames['thresh']+self.fileExt)
+                if self.nmsOption.isChecked():
+                    saveFlag = True
+                    data = self.parent().I.suppressed
+                    im.fromarray(data).convert('RGB').save(self.filepath+'/'+\
+                            self.filenames['nms']+self.fileExt)
 
-            if self.hysteresisOption.isChecked():
-                data = self.parent().I.final
-                im.fromarray(data).convert('RGB').save(self.filepath+'/'+\
-                        self.filenames['hyst']+self.fileExt)
+                if self.thresholdOption.isChecked():
+                    saveFlag = True
+                    data = self.parent().I.thresholded
+                    im.fromarray(data).convert('RGB').save(self.filepath+'/'+\
+                            self.filenames['thresh']+self.fileExt)
 
-            # Display success message
-            self.successDialog()
+                if self.hysteresisOption.isChecked():
+                    saveFlag = True
+                    data = self.parent().I.final
+                    im.fromarray(data).convert('RGB').save(self.filepath+'/'+\
+                            self.filenames['hyst']+self.fileExt)
+
+                # Display success message
+                if saveFlag:
+                    self.successDialog()
+
+            except Exception as error:
+                self.emit(QtCore.SIGNAL('errorException'), "Invalid filename")
 
     def successDialog(self):
         """
