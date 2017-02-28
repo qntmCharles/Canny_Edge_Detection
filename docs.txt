@@ -1,0 +1,52 @@
+Documentation
+
+Use (GUI)
+
+1. Load an image
+	An image can be loaded into the program by clicking on the 'open file' button in the top right corner. This will open a system file dialog - use this to select your file.
+
+2. After loading
+	When an image has been loaded, you can show the full filepath by clicking on the label in the top left, or click on 'show file' to display the file you have loaded.
+
+3. Changing parameters
+	Before you start processing, you may wish to change some parameters. Gaussian blur parameters can be modified by selecting from the dropdown menu. Your choice of thresholding method can be selected below this, and if necessary, threshold ratios may be entered for manual thresholding.
+
+4. Starting processing
+	To start the processing, click on 'Start'. The stage labels will change as each stage is completed, processing, or not started.
+
+5. Cancelling processing
+	To cancel processing, click 'cancel'. You may then either reset the GUI to a state as if you had just loaded an image, by pressing 'reset', or you can simply restart by clicking 'start'.
+
+6. Showing an image
+	Once processing has finished for each stage, a 'show' button will appear. Click this to display the resulting image.
+
+7. Saving an image
+	Once processing has finished for each stage, a 'save' button will appear. Clicking this will allow you to save the image. Note that it must be saved as a .jpg, .png, .bmp, or .gif. Once processing has finished for all images, a 'save all' button will appear. Clicking this will take you to the necessary dialog. From here, you can select a directory to save the images to, select a file extension, and modify the names, as well as specifying which to save.
+
+Use (canny module)
+
+1. System path
+	Add the path to the file containing the canny folder to your system path.
+
+2. Import the module
+	Import the module using 'import canny'. If successful, 'canny initialised' will be displayed in the terminal.
+
+3. Loading & saving an image
+	The canny module does not provide functionality for opening or saving images. This can be done using any external library.
+
+4. Initialising an image object
+	Before processing, an image object must be made. This is done by passing it to the object: 'canny.Image(<loaded image>)'.
+
+5. Starting processing
+	Processing may now be started by typing 'canny.fullCanny()'.
+
+Notes
+
+1. Time:
+	The process of canny edge detection can be quite CPU intensive. On older machines, or those with lower capabilities, processing images may take longer than expected.
+
+2. File changes:
+	Any manipulation of images that takes place in this program is in-place until an image is saved. Any changes made to a loaded image will not impact the image as stored on the computer, unless saved to the same location.
+
+3. Filepath:
+	When an image has been loaded, you can click on the label in the top left corner to show the full filepath.

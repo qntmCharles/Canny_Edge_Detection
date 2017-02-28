@@ -12,10 +12,10 @@ def splitDictionary(dictionary,threshold):
         integers: this is checked in the assert statement
     """
 
-    # Check that the keys are all integers
+    # Check that the keys are all orderable types
     for key in dictionary.keys():
         assert isinstance(key,int) or isinstance(key,str), \
-                'Dictionary keys contain non-integer'
+                'Dictionary keys contain unorderable type'
 
     # Initialise dictionaries
     lowDict = {}

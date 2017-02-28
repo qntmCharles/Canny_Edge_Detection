@@ -621,13 +621,20 @@ class CannyWindow(QtGui.QWidget):
         # If the file dialog returned a filepath
         if filepath:
             try:
-                # If not the required format, show error message
-                if filepath.split('.')[1] not in ['jpg', 'gif', 'bmp', 'png']:
-                    self.errorMessage(\
-                            "Must be saved as .jpg, .gif, .bmp or .png")
-                # Try to save the image
+                # Check if a file extension has been specified
+                if len(filepath.split('.')) == 1:
+                    im.fromarray(image.astype(np.uint8)).save(filepath+'.bmp')
+
+                elif len(filepath.split('.')) == 2:
+                    # If not the required format, show error message
+                    if filepath.split('.')[1] not in ['jpg', 'gif', 'bmp', 'png']:
+                        self.errorMessage(\
+                                "Must be saved as .jpg, .gif, .bmp or .png")
+                    # Try to save the image
+                    else:
+                        im.fromarray(image.astype(np.uint8)).save(filepath)
                 else:
-                    im.fromarray(image.astype(np.uint8)).save(filepath)
+                    self.errorMessage('Invalid filename')
 
             except Exception as error:
                 # If an error occurs, display the error
@@ -844,6 +851,13 @@ class CannyWindow(QtGui.QWidget):
         """
         # Hide the save all button
         self.saveAllButton.hide()
+
+        # Reset stage labels
+        self.gblurLabel.setText('Gaussian Blur: not started')
+        self.sobelLabel.setText('Sobel Filter: not started')
+        self.nmsLabel.setText('Non Maximum Suppression: not started')
+        self.thresholdLabel.setText('Thresholding: not started')
+        self.hysteresisLabel.setText('Hysteresis: not started')
 
         # Hide show & save buttons
         for i in range(0,2):
